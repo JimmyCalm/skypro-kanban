@@ -22,10 +22,11 @@ export default function Header() {
             <a href="#user-set-target" className="header__user _hover02">
               Ivan Ivanov
             </a>
+            <PopUser />
           </nav>
         </div>
       </div>
-      <PopUser />
+      
     </header>
   );
 }
