@@ -1,34 +1,23 @@
-import Column from '../Column/Column';
-import Card from '../Card/Card';
+import Column from "../Column/Column";
 
-function Main() {
+export default function Main() {
+  const statuses = [
+    "Без статуса",
+    "Нужно сделать",
+    "В работе",
+    "Тестирование",
+    "Готово",
+  ];
+
   return (
     <main className="main">
       <div className="container">
         <div className="main__block">
-          <div className="main__content">
-            <Column title="Без статуса">
-              <Card />
-              <Card />
-            </Column>
-            <Column title="Нужно сделать">
-              <Card />
-            </Column>
-            <Column title="В работе">
-              <Card />
-              <Card />
-            </Column>
-            <Column title="Тестирование">
-              <Card />
-            </Column>
-            <Column title="Готово">
-              <Card />
-            </Column>
-          </div>
+          {statuses.map((status) => (
+            <Column key={status} title={status} />
+          ))}
         </div>
       </div>
     </main>
   );
 }
-
-export default Main;
