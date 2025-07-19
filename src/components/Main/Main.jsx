@@ -1,4 +1,5 @@
 import Column from "../Column/Column";
+import { cardList } from "../../data";
 
 export default function Main() {
   const statuses = [
@@ -14,7 +15,11 @@ export default function Main() {
       <div className="container">
         <div className="main__block">
           {statuses.map((status) => (
-            <Column key={status} title={status} />
+            <Column 
+            key={status}
+            title={status}
+            cards={cardList.filter(card => card.status === status)} 
+            />
           ))}
         </div>
       </div>
