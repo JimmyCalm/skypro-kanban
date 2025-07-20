@@ -123,24 +123,24 @@ body {
   color: #ffffff;
 }
 
-.pop-user-set:target,
+/* .pop-user-set:target,
 .pop-exit:target,
 .pop-new-card:target,
 .pop-browse:target {
   display: block;
-}
+} */
 
-._orange {
+._web-design {
   background-color: #ffe4c2;
   color: #ff6d00;
 }
 
-._green {
+._research {
   background-color: #b4fdd1;
   color: #06b16e;
 }
 
-._purple {
+._copywriting {
   background-color: #e9d4ff;
   color: #9a48f1;
 }
@@ -831,10 +831,7 @@ body {
   padding: 0;
 }
 .header__pop-user-set {
-  display: none;
-  position: absolute;
-  top: 61px;
-  right: 0;
+  display: block;
   width: 213px;
   height: 205px;
   border-radius: 10px;
@@ -843,7 +840,6 @@ body {
   box-shadow: 0px 10px 39px 0px rgba(26, 56, 101, 0.21);
   padding: 34px;
   text-align: center;
-  z-index: 2;
 }
 
 .main {
