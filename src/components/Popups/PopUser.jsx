@@ -3,12 +3,6 @@ export default function PopUser({ onClose }) {
     <div 
       className="header__pop-user-set pop-user-set" 
       id="user-set-target"
-      style={{
-        position: 'absolute',
-        top: '61px',
-        right: '0',
-        zIndex: '10',
-      }}
     >
       <a 
         href="#" 
