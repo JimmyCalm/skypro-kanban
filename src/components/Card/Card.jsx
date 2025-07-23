@@ -1,27 +1,37 @@
+import {
+  CardItem,
+  CardWrapper,
+  CardGroup,
+  CardTheme,
+  CardButton,
+  CardContent,
+  CardTitle,
+  CardDate,
+} from './Card.styled';
+
 export default function Card({ cardData }) {
   const { topic, title, date } = cardData;
 
-  const themeClass = `_${topic.toLowerCase().replace(" ", "-")}`;
+  const theme = topic.toLowerCase().replace(' ', '');
+
   return (
-    <div className="cards__item">
-      <div className="cards__card card">
-        <div className="card__group">
-          <div className={`card__theme ${themeClass}`}>
-            <p className={themeClass}>{topic}</p>
-          </div>
-          <a href="#popBrowse" target="_self">
-            <div className="card__btn">
-              <div></div>
-              <div></div>
-              <div></div>
-            </div>
-          </a>
-        </div>
-        <div className="card__content">
+    <CardItem className="cards__item">
+      <CardWrapper className="card">
+        <CardGroup>
+          <CardTheme theme={theme} className={`card__theme _${theme}`}>
+            <p className={`_${theme}`}>{topic}</p>
+          </CardTheme>
+          <CardButton href="#popBrowse" target="_self">
+            <div></div>
+            <div></div>
+            <div></div>
+          </CardButton>
+        </CardGroup>
+        <CardContent>
           <a href="" target="_blank">
-            <h3 className="card__title">{title}</h3>
+            <CardTitle>{title}</CardTitle>
           </a>
-          <div className="card__date">
+          <CardDate>
             <svg
               xmlns="http://www.w3.org/2000/svg"
               width="13"
@@ -51,9 +61,9 @@ export default function Card({ cardData }) {
               </defs>
             </svg>
             <p>{date}</p>
-          </div>
-        </div>
-      </div>
-    </div>
+          </CardDate>
+        </CardContent>
+      </CardWrapper>
+    </CardItem>
   );
 }

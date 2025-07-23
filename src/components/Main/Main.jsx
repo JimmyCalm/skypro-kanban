@@ -1,15 +1,10 @@
-import Column from "../Column/Column";
-import { cardList } from "../../data";
-import { useState, useEffect } from "react";
+import Column from '../Column/Column';
+import { cardList } from '../../data';
+import { useState, useEffect } from 'react';
+import { MainWrapper, MainBlock, MainContent, LoadingContainer } from './Main.styled';
 
 export default function Main() {
-  const statuses = [
-    "Без статуса",
-    "Нужно сделать",
-    "В работе",
-    "Тестирование",
-    "Готово",
-  ];
+  const statuses = ['Без статуса', 'Нужно сделать', 'В работе', 'Тестирование', 'Готово'];
 
   const [isLoading, setIsLoading] = useState(true);
 
@@ -22,35 +17,20 @@ export default function Main() {
   }, []);
 
   return (
-    <main className="main">
+    <MainWrapper className="main">
       <div className="container">
-        <div className="main__block">
+        <MainBlock>
           {isLoading ? (
-            <div
-              style={{
-                width: "100%",
-                height: "60vh",
-                display: "flex",
-                alignItems: "center",
-                justifyContent: "center",
-                fontSize: "24px",
-                color: "#565eef",
-                fontWeight: "600",
-              }}
-            >
-              Данные загружаются...
-            </div>
+            <LoadingContainer>Данные загружаются...</LoadingContainer>
           ) : (
-            statuses.map((status) => (
-              <Column
-                key={status}
-                title={status}
-                cards={cardList.filter((card) => card.status === status)}
-              />
-            ))
+            <MainContent>
+              {statuses.map((status) => (
+                <Column key={status} title={status} cards={cardList.filter((card) => card.status === status)} />
+              ))}
+            </MainContent>
           )}
-        </div>
+        </MainBlock>
       </div>
-    </main>
+    </MainWrapper>
   );
 }

@@ -1,19 +1,19 @@
-import Card from "../Card/Card";
+import Card from '../Card/Card';
+import { ColumnWrapper, ColumnTitle, CardsContainer } from './Column.styled';
 
 export default function Column({ title, cards }) {
-
-  const filteredCards = cards.filter(card => card.status === title);
+  const filteredCards = cards.filter((card) => card.status === title);
 
   return (
-    <div className="main__column column">
-      <div className="column__title">
+    <ColumnWrapper className="column">
+      <ColumnTitle>
         <p>{title}</p>
-      </div>
-      <div className="cards">
-        {filteredCards.map(card => (
+      </ColumnTitle>
+      <CardsContainer className="cards">
+        {filteredCards.map((card) => (
           <Card key={card.id} cardData={card} />
         ))}
-      </div>
-    </div>
+      </CardsContainer>
+    </ColumnWrapper>
   );
 }

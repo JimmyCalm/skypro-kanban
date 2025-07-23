@@ -1,5 +1,13 @@
-import { useState } from "react";
-import PopUser from "../Popups/PopUser";
+import { useState } from 'react';
+import PopUser from '../Popups/PopUser';
+import {
+  HeaderWrapper,
+  HeaderBlock,
+  HeaderLogo,
+  HeaderNav,
+  HeaderButtonNew,
+  HeaderUser,
+} from './Header.styled';
 
 export default function Header() {
   const [isUserPopupOpen, setIsUserPopupOpen] = useState(false);
@@ -9,37 +17,36 @@ export default function Header() {
   };
 
   return (
-    <header className="header">
+    <HeaderWrapper className="header">
       <div className="container">
-        <div className="header__block">
-          <div className="header__logo _show _light">
+        <HeaderBlock>
+          <HeaderLogo className="_show _light">
             <a href="" target="_self">
-              <img src="../public/images/logo.png" alt="logo"></img>
+              <img src="../public/images/logo.png" alt="logo" />
             </a>
-          </div>
-          <div className="header__logo _dark">
+          </HeaderLogo>
+          <HeaderLogo className="_dark">
             <a href="" target="_self">
-              <img src="../public/images/logo_dark.png" alt="logo"></img>
+              <img src="../public/images/logo_dark.png" alt="logo" />
             </a>
-          </div>
-          <nav className="header__nav">
-            <button className="header__btn-main-new _hover01" id="btnMainNew">
+          </HeaderLogo>
+          <HeaderNav>
+            <HeaderButtonNew id="btnMainNew">
               <a href="#popNewCard">Создать новую задачу</a>
-            </button>
-            <a 
-              href="#user-set-target" 
-              className="header__user _hover02"
+            </HeaderButtonNew>
+            <HeaderUser
+              href="#user-set-target"
               onClick={(e) => {
                 e.preventDefault();
                 toggleUserPopup();
               }}
             >
               Ivan Ivanov
-            </a>
+            </HeaderUser>
             {isUserPopupOpen && <PopUser onClose={toggleUserPopup} />}
-          </nav>
-        </div>
+          </HeaderNav>
+        </HeaderBlock>
       </div>
-    </header>
+    </HeaderWrapper>
   );
 }
