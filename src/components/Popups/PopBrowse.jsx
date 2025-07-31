@@ -51,6 +51,7 @@ export default function PopBrowse() {
                   ></textarea>
                 </div>
               </form>
+              <Calendar />
             </div>
             <div className="theme-down__categories theme-down">
               <p className="categories__p subttl">Категория</p>
@@ -90,7 +91,7 @@ export default function PopBrowse() {
                 <a href="#">Закрыть</a>
               </button>
             </div>
-            <Calendar />
+            
           </div>
         </div>
       </div>

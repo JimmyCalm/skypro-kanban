@@ -3,8 +3,7 @@ import Main from './components/Main/Main';
 import PopExit from './components/Popups/PopExit';
 import PopNewCard from './components/Popups/PopNewCard';
 import PopBrowse from './components/Popups/PopBrowse';
-import { GlobalStyles } from './Styles/GlobalStyles';
-import './App.css'; 
+import { GlobalStyles } from './Styles/GlobalStyles'; 
 
 function App() {
   return (
