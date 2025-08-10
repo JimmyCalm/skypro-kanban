@@ -104,7 +104,7 @@ body {
 }
 
 .pop-new-card {
-  display: none;
+  /* display: none; */
   width: 100%;
   min-width: 375px;
   height: 100%;
@@ -360,7 +360,7 @@ body {
   white-space: nowrap;
 }
 .pop-browse {
-  display: none;
+  /* display: none; */
   width: 100%;
   height: 100%;
   min-width: 375px;

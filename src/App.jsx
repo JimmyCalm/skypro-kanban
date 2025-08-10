@@ -1,7 +1,13 @@
-import AppRoutes from './components/AppRoutes';
+import AppRoutes from "./components/AppRoutes";
+import { GlobalStyles } from "./Styles/GlobalStyles";
 
 function App() {
-  return <AppRoutes />;
+  return (
+    <>
+      <GlobalStyles />
+      <AppRoutes />
+    </>
+  );
 }
 
 export default App;

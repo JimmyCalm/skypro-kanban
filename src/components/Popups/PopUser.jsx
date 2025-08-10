@@ -5,19 +5,23 @@ import {
   PopUserTheme,
   PopUserButton,
 } from './PopUser.styled';
+import { useLocation, Link } from 'react-router-dom';
 
 export default function PopUser({ onClose }) {
+  const location = useLocation();
+
   return (
     <PopUserWrapper id="user-set-target">
-      <a
-        href="#"
+      <Link
+        to="#"
         onClick={(e) => {
           e.preventDefault();
           onClose();
         }}
+        state={{ backgroundLocation: location }}
       >
         x
-      </a>
+      </Link>
       <PopUserName>Ivan Ivanov</PopUserName>
       <PopUserMail>ivan.ivanov@gmail.com</PopUserMail>
       <PopUserTheme>
@@ -31,7 +35,10 @@ export default function PopUser({ onClose }) {
           onClose();
         }}
       >
-        <a href="#popExit">Выйти</a>
+        <Link to="/exit"
+              state={{ backgroundLocation: location }}>
+          Выйти
+        </Link>
       </PopUserButton>
     </PopUserWrapper>
   );

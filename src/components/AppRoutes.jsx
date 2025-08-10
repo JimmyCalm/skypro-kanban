@@ -1,70 +1,58 @@
-import { Routes, Route, Navigate } from 'react-router-dom';
-import Layout from './Layout';
-import MainPage from '../pages/MainPage';
-import LoginPage from '../pages/LoginPage';
-import RegisterPage from '../pages/RegisterPage';
-import CardPage from '../pages/CardPage';
-import NewCardPage from '../pages/NewCardPage';
-import ExitPage from '../pages/ExitPage';
-import NotFoundPage from '../pages/NotFoundPage';
-import { useState } from 'react';
+import { Routes, Route, Navigate, useLocation } from "react-router-dom";
+import { useState } from "react";
+import MainPage from "../pages/MainPage";
+import LoginPage from "../pages/LoginPage";
+import RegisterPage from "../pages/RegisterPage";
+import ExitPage from "../pages/ExitPage";
+import NotFoundPage from "../pages/NotFoundPage";
+import PopBrowsePage from "../pages/PopBrowsePage";
+import PopNewCardPage from "../pages/PopNewCardPage";
+import Layout from "./Layout";
 
-const ProtectedRoute = ({ children, isAuth }) => {
-  console.log('ProtectedRoute isAuth:', isAuth);
-  if (!isAuth) {
-    return <Navigate to="/login" replace />;
-  }
-  return children;
-};
+function ProtectedRoute({ isAuth, children }) {
+  return isAuth ? children : <Navigate to="/login" replace />;
+}
 
 export default function AppRoutes() {
   const [isAuth, setIsAuth] = useState(false);
-
-  const handleLogin = () => {
-    console.log('handleLogin called, setting isAuth to true');
-    setIsAuth(true);
-  };
-  const handleLogout = () => setIsAuth(false);
+  const location = useLocation();
+  const state = location.state;
+  const backgroundLocation = state && state.backgroundLocation;
 
   return (
-    <Routes>
-      <Route element={<Layout />}>
-        <Route path="/login" element={<LoginPage onLogin={handleLogin} />} />
+    <>
+      <Routes location={backgroundLocation || location}>
+        <Route
+          element={
+            <ProtectedRoute isAuth={isAuth}>
+              <Layout />
+            </ProtectedRoute>
+          }
+        >
+          <Route path="/" element={<MainPage setIsAuth={setIsAuth} />} />
+          <Route path="/card/:id" element={<PopBrowsePage />} />
+          <Route path="/new" element={<PopNewCardPage />} />
+          <Route path="/exit" element={<ExitPage setIsAuth={setIsAuth} />} />
+        </Route>
+        <Route path="/login" element={<LoginPage setIsAuth={setIsAuth} />} />
         <Route path="/register" element={<RegisterPage />} />
-        <Route
-          path="/"
-          element={
-            <ProtectedRoute isAuth={isAuth}>
-              <MainPage />
-            </ProtectedRoute>
-          }
-        />
-        <Route
-          path="/card/:id"
-          element={
-            <ProtectedRoute isAuth={isAuth}>
-              <CardPage />
-            </ProtectedRoute>
-          }
-        />
-        <Route
-          path="/new-card"
-          element={
-            <ProtectedRoute isAuth={isAuth}>
-              <NewCardPage />
-            </ProtectedRoute>
-          }
-        />
-        <Route
-          path="/exit"
-          element={
-            <ProtectedRoute isAuth={isAuth}>
-              <ExitPage onLogout={handleLogout} />
-            </ProtectedRoute>
-          }
-        />
         <Route path="*" element={<NotFoundPage />} />
-      </Route>
-    </Routes>
+      </Routes>
+      {backgroundLocation && (
+        <Routes>
+          <Route
+            element={
+              <ProtectedRoute isAuth={isAuth}>
+                <Layout />
+              </ProtectedRoute>
+            }
+          >
+            <Route path="/card/:id" element={<PopBrowsePage />} />
+            <Route path="/new" element={<PopNewCardPage />} />
+            <Route path="/exit" element={<ExitPage setIsAuth={setIsAuth} />} />
+          </Route>
+        </Routes>
+      )}
+    </>
   );
 }

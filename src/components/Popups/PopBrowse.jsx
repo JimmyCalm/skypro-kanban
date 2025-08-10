@@ -1,6 +1,10 @@
 import Calendar from "../Calendar/Calendar";
+import { useNavigate, useLocation, Link } from "react-router-dom";
 
 export default function PopBrowse() {
+  const location = useLocation();
+  const navigate = useNavigate();
+
   return (
     <div className="pop-browse" id="popBrowse">
       <div className="pop-browse__container">
@@ -62,36 +66,51 @@ export default function PopBrowse() {
             <div className="pop-browse__btn-browse ">
               <div className="btn-group">
                 <button className="btn-browse__edit _btn-bor _hover03">
-                  <a href="#">Редактировать задачу</a>
+                  <Link to="#" state={{ backgroundLocation: location }}>
+                    Редактировать задачу
+                  </Link>
                 </button>
                 <button className="btn-browse__delete _btn-bor _hover03">
-                  <a href="#">Удалить задачу</a>
+                  <Link to="#" state={{ backgroundLocation: location }}>
+                    Удалить задачу
+                  </Link>
                 </button>
               </div>
-              <button className="btn-browse__close _btn-bg _hover01">
-                <a href="#">Закрыть</a>
+              <button
+                className="btn-browse__close _btn-bg _hover01"
+                onClick={() => navigate(-1)}
+              >
+                Закрыть
               </button>
             </div>
             <div className="pop-browse__btn-edit _hide">
               <div className="btn-group">
                 <button className="btn-edit__edit _btn-bg _hover01">
-                  <a href="#">Сохранить</a>
+                  <Link to="#" state={{ backgroundLocation: location }}>
+                    Сохранить
+                  </Link>
                 </button>
                 <button className="btn-edit__edit _btn-bor _hover03">
-                  <a href="#">Отменить</a>
+                  <Link to="#" state={{ backgroundLocation: location }}>
+                    Отменить
+                  </Link>
                 </button>
                 <button
                   className="btn-edit__delete _btn-bor _hover03"
                   id="btnDelete"
                 >
-                  <a href="#">Удалить задачу</a>
+                  <Link to="#" state={{ backgroundLocation: location }}>
+                    Удалить задачу
+                  </Link>
                 </button>
               </div>
-              <button className="btn-edit__close _btn-bg _hover01">
-                <a href="#">Закрыть</a>
+              <button
+                className="btn-edit__close _btn-bg _hover01"
+                onClick={() => navigate(-1)}
+              >
+                Закрыть
               </button>
             </div>
-            
           </div>
         </div>
       </div>

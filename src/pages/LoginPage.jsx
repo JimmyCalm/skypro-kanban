@@ -1,6 +1,7 @@
-import styled from 'styled-components';
-import { GlobalStyles } from '../Styles/GlobalStyles';
-import { useNavigate } from 'react-router-dom';
+import styled from "styled-components";
+import { GlobalStyles } from "../Styles/GlobalStyles";
+import { useNavigate } from "react-router-dom";
+import { Link } from "react-router-dom";
 
 const LoginWrapper = styled.div`
   width: 100%;
@@ -45,30 +46,31 @@ const LoginButton = styled.button`
 
 const LoginDescription = styled.p`
   margin: 10px 0;
-  color: #94A6BE66;
+  color: #94a6be66;
 `;
 
-export default function LoginPage({ onLogin }) {
+export default function LoginPage({ setIsAuth }) {
   const navigate = useNavigate();
 
   const handleSubmit = (e) => {
     e.preventDefault();
-    if (onLogin) {
-      onLogin();
-      navigate('/');
+    if (setIsAuth) {
+      setIsAuth(true);
+      navigate("/");
     }
   };
 
   return (
-      <LoginWrapper>
-        <GlobalStyles />
-        <LoginForm onSubmit={handleSubmit}>
-          <h2>Вход</h2>
-          <LoginInput type="text" placeholder="Эл.почта" />
-          <LoginInput type="password" placeholder="Пароль" />
+    <LoginWrapper>
+      <GlobalStyles />
+      <LoginForm onSubmit={handleSubmit}>
+        <h2>Вход</h2>
+        <LoginInput type="text" placeholder="Эл.почта" />
+        <LoginInput type="password" placeholder="Пароль" />
         <LoginButton type="submit">Войти</LoginButton>
         <LoginDescription>
-          Нужно зарегистрироваться? <a href="/register">Регистрируйтесь здесь</a>
+          Нужно зарегистрироваться?{" "}
+          <Link to="/register">Регистрируйтесь здесь</Link>
         </LoginDescription>
       </LoginForm>
     </LoginWrapper>

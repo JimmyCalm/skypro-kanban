@@ -1,5 +1,6 @@
 import styled from 'styled-components';
 import { GlobalStyles } from '../Styles/GlobalStyles';
+import { Link, useNavigate } from "react-router-dom";
 
 const RegisterWrapper = styled.div`
   width: 100%;
@@ -48,8 +49,11 @@ const RegisterDescription = styled.p`
 `;
 
 export default function RegisterPage() {
+  const navigate = useNavigate();
+
   const handleSubmit = (e) => {
     e.preventDefault();
+    navigate("/");
   };
 
   return (
@@ -62,7 +66,7 @@ export default function RegisterPage() {
         <RegisterInput type="password" placeholder="Пароль" />
         <RegisterButton type="submit">Зарегистрироваться</RegisterButton>
         <RegisterDescription>
-          Уже есть аккаунт? <a href="/login">Войдите здесь</a>
+          Уже есть аккаунт? <Link to="/login">Войдите здесь</Link>
         </RegisterDescription>
       </RegisterForm>
     </RegisterWrapper>

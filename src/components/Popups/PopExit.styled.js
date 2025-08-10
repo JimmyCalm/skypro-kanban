@@ -1,7 +1,7 @@
 import styled from 'styled-components';
 
 export const PopExitWrapper = styled.div`
-  display: none;
+  /* display: none; */
   width: 100%;
   height: 100%;
   min-width: 320px;
