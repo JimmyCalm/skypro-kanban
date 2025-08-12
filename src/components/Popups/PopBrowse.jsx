@@ -1,7 +1,7 @@
 import Calendar from "../Calendar/Calendar";
 import { useNavigate, useLocation, Link } from "react-router-dom";
 
-export default function PopBrowse() {
+export default function PopBrowse({ cardId }) {
   const location = useLocation();
   const navigate = useNavigate();
 
@@ -11,7 +11,7 @@ export default function PopBrowse() {
         <div className="pop-browse__block">
           <div className="pop-browse__content">
             <div className="pop-browse__top-block">
-              <h3 className="pop-browse__ttl">Название задачи</h3>
+              <h3 className="pop-browse__ttl">Карточка №{cardId}</h3>
               <div className="categories__theme theme-top _web-design _active-category">
                 <p className="_web-design">Web Design</p>
               </div>

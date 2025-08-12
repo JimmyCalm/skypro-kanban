@@ -13,7 +13,10 @@ export default function PopNewCard() {
             <a
               href="#"
               className="pop-new-card__close"
-              onClick={() => navigate(-1)}
+              onClick={(e) => {
+                e.preventDefault();
+                navigate(-1);
+              }}
             >
               &#10006;
             </a>

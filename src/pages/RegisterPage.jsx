@@ -46,6 +46,15 @@ const RegisterDescription = styled.p`
   margin: 10px 0;
   color: #94A6BE66;
   font-size: 14px;
+
+  a {
+    color: inherit;
+    text-decoration: none;
+
+    &:hover {
+      text-decoration: underline;
+    }
+  }
 `;
 
 export default function RegisterPage() {

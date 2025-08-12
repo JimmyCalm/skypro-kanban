@@ -47,6 +47,15 @@ const LoginButton = styled.button`
 const LoginDescription = styled.p`
   margin: 10px 0;
   color: #94a6be66;
+
+  a {
+    color: inherit;
+    text-decoration: none;
+
+    &:hover {
+      text-decoration: underline;
+    }
+  }
 `;
 
 export default function LoginPage({ setIsAuth }) {

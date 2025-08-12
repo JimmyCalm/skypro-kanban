@@ -1,4 +1,5 @@
-import styled from 'styled-components';
+import { Link } from "react-router-dom";
+import styled from "styled-components";
 
 const NotFoundWrapper = styled.div`
   width: 100%;
@@ -23,6 +24,7 @@ export default function NotFoundPage() {
       <NotFoundMessage>
         <h2>404 - Страница не найдена</h2>
         <p>К сожалению, запрошенная страница не существует.</p>
+        <Link to="/">Вернуться на главную</Link>
       </NotFoundMessage>
     </NotFoundWrapper>
   );
