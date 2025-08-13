@@ -1,5 +1,5 @@
 import Calendar from "../Calendar/Calendar";
-import { useNavigate, Link } from "react-router-dom";
+import { useNavigate } from "react-router-dom";
 
 export default function PopNewCard() {
   const navigate = useNavigate();

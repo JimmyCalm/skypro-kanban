@@ -1,6 +1,6 @@
-import { useLocation, Link } from "react-router-dom";
-import { useState } from 'react';
-import PopUser from '../Popups/PopUser';
+import { Link } from "react-router-dom";
+import { useState } from "react";
+import PopUser from "../Popups/PopUser";
 import {
   HeaderWrapper,
   HeaderBlock,
@@ -8,12 +8,10 @@ import {
   HeaderNav,
   HeaderButtonNew,
   HeaderUser,
-} from './Header.styled';
+} from "./Header.styled";
 
 export default function Header() {
   const [isUserPopupOpen, setIsUserPopupOpen] = useState(false);
-  const location = useLocation();
-
   const toggleUserPopup = () => {
     setIsUserPopupOpen(!isUserPopupOpen);
   };
@@ -23,23 +21,18 @@ export default function Header() {
       <div className="container">
         <HeaderBlock>
           <HeaderLogo className="_show _light">
-            <Link to="/"
-                  state={{ backgroundLocation: location }}>
+            <Link to="/">
               <img src="../public/images/logo.png" alt="logo" />
             </Link>
           </HeaderLogo>
           <HeaderLogo className="_dark">
-            <Link to="/"
-                  state={{ backgroundLocation: location }}>
+            <Link to="/">
               <img src="../public/images/logo_dark.png" alt="logo" />
             </Link>
           </HeaderLogo>
           <HeaderNav>
             <HeaderButtonNew id="btnMainNew">
-              <Link to="/new"
-                    state={{ backgroundLocation: location }}>
-                Создать новую задачу
-              </Link>
+              <Link to="/new">Создать новую задачу</Link>
             </HeaderButtonNew>
             <HeaderUser
               href="#user-set-target"

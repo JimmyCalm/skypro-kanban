@@ -9,12 +9,21 @@ import {
   PopExitButtonNo,
 } from "./PopExit.styled";
 
-export default function PopExit({ setIsAuth }) {
+export default function PopExit({ setIsAuth, onClose }) {
   const navigate = useNavigate();
 
   const handleExit = () => {
     setIsAuth(false);
     navigate("/login", { replace: true });
+  };
+
+  const handleStay = (e) => {
+    e.preventDefault();
+    if (onClose) {
+      onClose();
+    } else {
+      navigate(-1);
+    }
   };
 
   return (
@@ -28,7 +37,7 @@ export default function PopExit({ setIsAuth }) {
             <PopExitButtonYes id="exitYes" onClick={handleExit}>
               Да, выйти
             </PopExitButtonYes>
-            <PopExitButtonNo id="exitNo" onClick={() => navigate(-1)}>
+            <PopExitButtonNo id="exitNo" onClick={handleStay}>
               Нет, остаться
             </PopExitButtonNo>
           </PopExitForm>

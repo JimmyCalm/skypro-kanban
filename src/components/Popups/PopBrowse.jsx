@@ -1,8 +1,7 @@
 import Calendar from "../Calendar/Calendar";
-import { useNavigate, useLocation, Link } from "react-router-dom";
+import { useNavigate, Link } from "react-router-dom";
 
 export default function PopBrowse({ cardId }) {
-  const location = useLocation();
   const navigate = useNavigate();
 
   return (
@@ -66,12 +65,12 @@ export default function PopBrowse({ cardId }) {
             <div className="pop-browse__btn-browse ">
               <div className="btn-group">
                 <button className="btn-browse__edit _btn-bor _hover03">
-                  <Link to="#" state={{ backgroundLocation: location }}>
+                  <Link to="#">
                     Редактировать задачу
                   </Link>
                 </button>
                 <button className="btn-browse__delete _btn-bor _hover03">
-                  <Link to="#" state={{ backgroundLocation: location }}>
+                  <Link to="#">
                     Удалить задачу
                   </Link>
                 </button>
@@ -86,12 +85,12 @@ export default function PopBrowse({ cardId }) {
             <div className="pop-browse__btn-edit _hide">
               <div className="btn-group">
                 <button className="btn-edit__edit _btn-bg _hover01">
-                  <Link to="#" state={{ backgroundLocation: location }}>
+                  <Link to="#">
                     Сохранить
                   </Link>
                 </button>
                 <button className="btn-edit__edit _btn-bor _hover03">
-                  <Link to="#" state={{ backgroundLocation: location }}>
+                  <Link to="#">
                     Отменить
                   </Link>
                 </button>
@@ -99,7 +98,7 @@ export default function PopBrowse({ cardId }) {
                   className="btn-edit__delete _btn-bor _hover03"
                   id="btnDelete"
                 >
-                  <Link to="#" state={{ backgroundLocation: location }}>
+                  <Link to="#">
                     Удалить задачу
                   </Link>
                 </button>

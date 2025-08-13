@@ -8,11 +8,10 @@ import {
   CardTitle,
   CardDate,
 } from "./Card.styled";
-import { useLocation, Link } from "react-router-dom";
+import { Link } from "react-router-dom";
 
 export default function Card({ cardData }) {
   const { topic, title, date } = cardData;
-  const location = useLocation();
   const theme = topic.toLowerCase().replace(" ", "");
 
   return (
@@ -22,16 +21,14 @@ export default function Card({ cardData }) {
           <CardTheme theme={theme} className={`card__theme _${theme}`}>
             <p className={`_${theme}`}>{topic}</p>
           </CardTheme>
-          <CardButton as={Link} to={`/card/${cardData.id}`}
-                                state={{ backgroundLocation: location }}>
+          <CardButton as={Link} to={`/card/${cardData.id}`}>
             <div></div>
             <div></div>
             <div></div>
           </CardButton>
         </CardGroup>
         <CardContent>
-          <Link to="" target="_blank"
-                state={{ backgroundLocation: location }}>
+          <Link to="" target="_blank">
             <CardTitle>{title}</CardTitle>
           </Link>
           <CardDate>
