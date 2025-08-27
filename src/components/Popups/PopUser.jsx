@@ -4,20 +4,21 @@ import {
   PopUserMail,
   PopUserTheme,
   PopUserButton,
-} from './PopUser.styled';
+} from "./PopUser.styled";
+import { Link } from "react-router-dom";
 
 export default function PopUser({ onClose }) {
   return (
     <PopUserWrapper id="user-set-target">
-      <a
-        href="#"
+      <Link
+        to="#"
         onClick={(e) => {
           e.preventDefault();
           onClose();
         }}
       >
         x
-      </a>
+      </Link>
       <PopUserName>Ivan Ivanov</PopUserName>
       <PopUserMail>ivan.ivanov@gmail.com</PopUserMail>
       <PopUserTheme>
@@ -31,7 +32,7 @@ export default function PopUser({ onClose }) {
           onClose();
         }}
       >
-        <a href="#popExit">Выйти</a>
+        <Link to="/exit">Выйти</Link>
       </PopUserButton>
     </PopUserWrapper>
   );
