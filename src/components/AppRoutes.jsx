@@ -29,8 +29,11 @@ export default function AppRoutes() {
           <Route path="/" element={<MainPage setIsAuth={setIsAuth} />}>
             <Route path="card/:id" element={<PopBrowsePage />} />
             <Route path="new" element={<PopNewCardPage />} />
+            <Route
+              path="exit"
+              element={<ExitPage setIsAuth={setIsAuth} />}
+            />{" "}
           </Route>
-          <Route path="/exit" element={<ExitPage setIsAuth={setIsAuth} />} />
         </Route>
         <Route path="/login" element={<LoginPage setIsAuth={setIsAuth} />} />
         <Route path="/register" element={<RegisterPage />} />
