@@ -1,6 +1,8 @@
 import styled from 'styled-components';
 import { GlobalStyles } from '../Styles/GlobalStyles';
-import { Link, useNavigate } from "react-router-dom";
+import { Link, useNavigate } from 'react-router-dom';
+import { useState } from 'react';
+import { registerUser } from '../services/auth';
 
 const RegisterWrapper = styled.div`
   width: 100%;
@@ -42,6 +44,7 @@ const RegisterButton = styled.button`
     background-color: #33399b;
   }
 `;
+
 const RegisterDescription = styled.p`
   margin: 10px 0;
   color: #94A6BE66;
@@ -57,12 +60,41 @@ const RegisterDescription = styled.p`
   }
 `;
 
+const ErrorMessage = styled.p`
+  color: #ff3333;
+  font-size: 12px;
+  margin-top: 5px;
+`;
+
 export default function RegisterPage() {
   const navigate = useNavigate();
 
-  const handleSubmit = (e) => {
+  const [formData, setFormData] = useState({
+  name: '',
+  login: '',
+  password: '',
+});
+  const [error, setError] = useState('');
+
+  const handleChange = (e) => {
+    const { name, value } = e.target;
+    setFormData((prev) => ({
+      ...prev,
+      [name]: value,
+    }));
+  };
+
+  const handleSubmit = async (e) => {
     e.preventDefault();
-    navigate("/");
+    setError('');
+
+    try {
+      const user = await registerUser(formData);
+      localStorage.setItem('token', user.token);
+      navigate('/');
+    } catch (err) {
+      setError(err.message || 'Ошибка регистрации. Проверьте данные и попробуйте снова.');
+    }
   };
 
   return (
@@ -70,9 +102,28 @@ export default function RegisterPage() {
       <GlobalStyles />
       <RegisterForm onSubmit={handleSubmit}>
         <h2>Регистрация</h2>
-        <RegisterInput type="text" placeholder="Логин" />
-        <RegisterInput type="email" placeholder="Email" />
-        <RegisterInput type="password" placeholder="Пароль" />
+        <RegisterInput
+          type="text"
+          name="name"
+          placeholder="Имя"
+          value={formData.name}
+          onChange={handleChange}
+        />
+        <RegisterInput
+          type="email"
+          name="login"
+          placeholder="Эл.почта"
+          value={formData.login}
+          onChange={handleChange}
+        />
+        <RegisterInput
+          type="password"
+          name="password"
+          placeholder="Пароль"
+          value={formData.password}
+          onChange={handleChange}
+        />
+        {error && <ErrorMessage>{error}</ErrorMessage>}
         <RegisterButton type="submit">Зарегистрироваться</RegisterButton>
         <RegisterDescription>
           Уже есть аккаунт? <Link to="/login">Войдите здесь</Link>
