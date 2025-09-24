@@ -60,6 +60,12 @@ const LoginDescription = styled.p`
   }
 `;
 
+const ErrorMessage = styled.p`
+  color: #ff3333;
+  font-size: 12px;
+  margin-top: 5px;
+`;
+
 export default function LoginPage({ setIsAuth }) {
   const navigate = useNavigate();
   const [login, setLogin] = useState("");
@@ -72,19 +78,13 @@ export default function LoginPage({ setIsAuth }) {
 
     try {
       const userData = await loginUser({ login, password });
-      
-      localStorage.setItem("token", userData.token);
-      
+      localStorage.setItem("userInfo", JSON.stringify(userData));
       if (setIsAuth) {
         setIsAuth(true);
       }
-      
       navigate("/");
     } catch (err) {
-      
-      setError(
-        err.message || "Ошибка авторизации. Проверьте логин и пароль."
-      );
+      setError(err.message || "Ошибка авторизации. Проверьте логин и пароль.");
     }
   };
 
@@ -93,9 +93,19 @@ export default function LoginPage({ setIsAuth }) {
       <GlobalStyles />
       <LoginForm onSubmit={handleSubmit}>
         <h2>Вход</h2>
-        <LoginInput type="text" placeholder="Эл.почта" value={login} onChange={(e) => setLogin(e.target.value)}/>
-        <LoginInput type="password" placeholder="Пароль" value={password} onChange={(e) => setPassword(e.target.value)}/>
-          {error && <ErrorMessage>{error}</ErrorMessage>}
+        <LoginInput
+          type="text"
+          placeholder="Эл.почта"
+          value={login}
+          onChange={(e) => setLogin(e.target.value)}
+        />
+        <LoginInput
+          type="password"
+          placeholder="Пароль"
+          value={password}
+          onChange={(e) => setPassword(e.target.value)}
+        />
+        {error && <ErrorMessage>{error}</ErrorMessage>}
         <LoginButton type="submit">Войти</LoginButton>
         <LoginDescription>
           Нужно зарегистрироваться?{" "}

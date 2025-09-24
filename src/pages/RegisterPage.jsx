@@ -1,8 +1,8 @@
-import styled from 'styled-components';
-import { GlobalStyles } from '../Styles/GlobalStyles';
-import { Link, useNavigate } from 'react-router-dom';
-import { useState } from 'react';
-import { registerUser } from '../services/auth';
+import styled from "styled-components";
+import { GlobalStyles } from "../Styles/GlobalStyles";
+import { Link, useNavigate } from "react-router-dom";
+import { useState } from "react";
+import { registerUser } from "../services/auth";
 
 const RegisterWrapper = styled.div`
   width: 100%;
@@ -47,7 +47,7 @@ const RegisterButton = styled.button`
 
 const RegisterDescription = styled.p`
   margin: 10px 0;
-  color: #94A6BE66;
+  color: #94a6be66;
   font-size: 14px;
 
   a {
@@ -66,15 +66,15 @@ const ErrorMessage = styled.p`
   margin-top: 5px;
 `;
 
-export default function RegisterPage() {
+export default function RegisterPage({ setIsAuth }) {
   const navigate = useNavigate();
 
   const [formData, setFormData] = useState({
-  name: '',
-  login: '',
-  password: '',
-});
-  const [error, setError] = useState('');
+    name: "",
+    login: "",
+    password: "",
+  });
+  const [error, setError] = useState("");
 
   const handleChange = (e) => {
     const { name, value } = e.target;
@@ -86,14 +86,17 @@ export default function RegisterPage() {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    setError('');
+    setError("");
 
     try {
       const user = await registerUser(formData);
-      localStorage.setItem('token', user.token);
-      navigate('/');
+      localStorage.setItem("userInfo", JSON.stringify(user));
+      if (setIsAuth) {
+        setIsAuth(true);
+      }
+      navigate("/");
     } catch (err) {
-      setError(err.message || 'Ошибка регистрации. Проверьте данные и попробуйте снова.');
+      setError(err.message || "Ошибка регистрации. Проверьте данные и попробуйте снова.");
     }
   };
 

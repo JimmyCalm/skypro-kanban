@@ -7,7 +7,7 @@ import {
   LoadingContainer,
 } from "../components/Main/Main.styled";
 import { Outlet, useNavigate } from "react-router-dom";
-import { getTasks } from "../services/kanban"; 
+import { getTasks } from "../services/kanban";
 
 export default function MainPage({ setIsAuth }) {
   const statuses = [
@@ -32,7 +32,8 @@ export default function MainPage({ setIsAuth }) {
 
   useEffect(() => {
     const fetchTasks = async () => {
-      const token = localStorage.getItem("token");
+      const userInfo = JSON.parse(localStorage.getItem("userInfo"));
+      const token = userInfo ? userInfo.token : null;
       if (!token) {
         setIsAuth(false);
         navigate("/login");
@@ -41,18 +42,20 @@ export default function MainPage({ setIsAuth }) {
 
       try {
         const fetchedTasks = await getTasks(token);
-
         const formattedTasks = fetchedTasks.map((task) => ({
           ...task,
           date: formatDate(task.date),
         }));
         setTasks(formattedTasks);
       } catch (error) {
-        console.error("Ошибка загрузки задач:", error);
-        if (error.response?.status === 401) {
-          localStorage.removeItem("token");
+        console.error("Ошибка загрузки задач:", error.message);
+        if (error.message.includes("401")) {
+          localStorage.removeItem("userInfo");
           setIsAuth(false);
           navigate("/login");
+        } else {
+          // Дополнительная отладка для других ошибок
+          console.error("Детали ошибки:", error);
         }
       } finally {
         setIsLoading(false);

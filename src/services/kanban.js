@@ -1,10 +1,11 @@
-import axios from 'axios';
+import axios from "axios";
 
-const BASE_URL = 'https://wedev-api.sky.pro/api/';
+const BASE_URL = "https://wedev-api.sky.pro/api/";
 
 const getAuthHeaders = (token) => ({
   headers: {
     Authorization: `Bearer ${token}`,
+    "Content-Type": "",
   },
 });
 
@@ -12,9 +13,14 @@ const getAuthHeaders = (token) => ({
 export const getTasks = async (token) => {
   try {
     const response = await axios.get(`${BASE_URL}kanban`, getAuthHeaders(token));
-    return response.data.tasks;
+    if (response.data && response.data.tasks) {
+      return response.data.tasks;
+    }
+    throw new Error("Некорректный ответ от сервера");
   } catch (error) {
-    throw error.response ? error.response.data : new Error('Не удалось получить задачи');
+    const errorMessage =
+      error.response?.data?.error || error.message || "Не удалось получить задачи";
+    throw new Error(errorMessage);
   }
 };
 
@@ -24,7 +30,9 @@ export const getTaskById = async (id, token) => {
     const response = await axios.get(`${BASE_URL}kanban/${id}`, getAuthHeaders(token));
     return response.data.task;
   } catch (error) {
-    throw error.response ? error.response.data : new Error('Failed to fetch task');
+    const errorMessage =
+      error.response?.data?.error || error.message || "Failed to fetch task";
+    throw new Error(errorMessage);
   }
 };
 
@@ -34,7 +42,9 @@ export const addTask = async (taskData, token) => {
     const response = await axios.post(`${BASE_URL}kanban`, taskData, getAuthHeaders(token));
     return response.data.tasks;
   } catch (error) {
-    throw error.response ? error.response.data : new Error('Не удалось добавить задачу');
+    const errorMessage =
+      error.response?.data?.error || error.message || "Не удалось добавить задачу";
+    throw new Error(errorMessage);
   }
 };
 
@@ -44,7 +54,9 @@ export const updateTask = async (id, taskData, token) => {
     const response = await axios.put(`${BASE_URL}kanban/${id}`, taskData, getAuthHeaders(token));
     return response.data.tasks;
   } catch (error) {
-    throw error.response ? error.response.data : new Error('Не удалось обновить задачу');
+    const errorMessage =
+      error.response?.data?.error || error.message || "Не удалось обновить задачу";
+    throw new Error(errorMessage);
   }
 };
 
@@ -54,6 +66,8 @@ export const deleteTask = async (id, token) => {
     const response = await axios.delete(`${BASE_URL}kanban/${id}`, getAuthHeaders(token));
     return response.data.tasks;
   } catch (error) {
-    throw error.response ? error.response.data : new Error('Не удалось удалить задачу');
+    const errorMessage =
+      error.response?.data?.error || error.message || "Не удалось удалить задачу";
+    throw new Error(errorMessage);
   }
-};
+}
