@@ -17,9 +17,17 @@ export default function PopBrowse() {
     topic: "Web Design",
     description: "",
     status: "Без статуса",
-    date: new Date().toISOString(), // По умолчанию
+    date: new Date().toISOString(),
   });
   const [error, setError] = useState("");
+
+  const statuses = [
+    "Без статуса",
+    "Нужно сделать",
+    "В работе",
+    "Тестирование",
+    "Готово",
+  ];
 
   useEffect(() => {
     const fetchTask = async () => {
@@ -54,10 +62,18 @@ export default function PopBrowse() {
     setFormData((prev) => ({ ...prev, date: newDate.toISOString() }));
   };
 
+  const handleStatusChange = (newStatus) => {
+    setFormData((prev) => ({ ...prev, status: newStatus }));
+  };
+
   const handleSave = async () => {
     const token = JSON.parse(localStorage.getItem("userInfo"))?.token;
     if (!token) {
       setError("Токен отсутствует. Пожалуйста, войдите заново.");
+      return;
+    }
+    if (!formData.status) {
+      setError("Выберите статус задачи");
       return;
     }
     try {
@@ -107,23 +123,25 @@ export default function PopBrowse() {
             </div>
             <div className="pop-browse__status status">
               <p className="status__p subttl">Статус</p>
-              <div className="status__themes">
-                {["Без статуса", "Нужно сделать", "В работе", "Тестирование", "Готово"].map(
-                  (status) => (
+              {isEditing ? (
+                <div className="status__themes">
+                  {statuses.map((status) => (
                     <div
                       key={status}
                       className={`status__theme ${
-                        isEditing && formData.status === status ? "_gray" : "_hide"
+                        formData.status === status ? "_active-status" : ""
                       }`}
-                      onClick={() =>
-                        isEditing && setFormData((prev) => ({ ...prev, status }))
-                      }
+                      onClick={() => handleStatusChange(status)}
                     >
-                      <p className={isEditing ? "" : "_hide"}>{status}</p>
+                      <p>{status}</p>
                     </div>
-                  )
-                )}
-              </div>
+                  ))}
+                </div>
+              ) : (
+                <div className="status__current">
+                  <p>{formData.status}</p>
+                </div>
+              )}
             </div>
             <div className="pop-browse__wrap">
               <form className="pop-browse__form form-browse" id="formBrowseCard">
@@ -142,7 +160,7 @@ export default function PopBrowse() {
                   ></textarea>
                 </div>
               </form>
-              {isEditing && ( // Показываем календарь только в режиме редактирования
+              {isEditing && (
                 <Calendar
                   selectedDate={new Date(formData.date)}
                   onDateChange={handleDateChange}

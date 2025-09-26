@@ -515,6 +515,26 @@ body {
   margin-right: 7px;
   margin-bottom: 7px;
 }
+.status__theme._active-status {
+  background-color: #565eef;
+  color: white;
+  border-radius: 4px;
+}
+.status__theme {
+  cursor: pointer;
+  padding: 5px 10px;
+  margin: 5px;
+  border: 1px solid #ccc;
+  border-radius: 4px;
+}
+.status__themes {
+  display: flex;
+  flex-wrap: wrap;
+}
+.status__current {
+  font-weight: bold;
+  color: #565eef;
+}
 .status__theme p {
   font-size: 14px;
   line-height: 1;
