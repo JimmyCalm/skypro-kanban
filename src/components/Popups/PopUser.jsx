@@ -8,7 +8,7 @@ import {
 import { Link } from "react-router-dom";
 import { useState } from "react";
 
-export default function PopUser({ onClose, userName, userEmail, onLogout }) {
+export default function PopUser({ onClose, userName, userEmail }) {
   const [isDarkTheme, setIsDarkTheme] = useState(
     localStorage.getItem("theme") === "dark"
   );
@@ -19,12 +19,6 @@ export default function PopUser({ onClose, userName, userEmail, onLogout }) {
     setIsDarkTheme(isDark);
     localStorage.setItem("theme", isDark ? "dark" : "light");
     document.body.className = isDark ? "dark" : "light"; // Пример смены темы
-  };
-
-  // Выход из аккаунта
-  const handleLogout = () => {
-    if (onLogout) onLogout();
-    onClose();
   };
 
   return (
@@ -49,8 +43,8 @@ export default function PopUser({ onClose, userName, userEmail, onLogout }) {
           onChange={handleThemeChange}
         />
       </PopUserTheme>
-      <PopUserButton type="button" onClick={handleLogout}>
-        <Link to="#" onClick={(e) => e.preventDefault()}>Выйти</Link>
+      <PopUserButton type="button">
+        <Link to="/exit">Выйти</Link>
       </PopUserButton>
     </PopUserWrapper>
   );

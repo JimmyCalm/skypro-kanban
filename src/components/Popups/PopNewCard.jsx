@@ -7,14 +7,19 @@ export default function PopNewCard() {
   const navigate = useNavigate();
   const [formData, setFormData] = useState({
     title: "",
-    topic: "Web Design", // Значение по умолчанию
+    topic: "Web Design",
     description: "",
-    status: "Без статуса", // Значение по умолчанию
+    status: "Без статуса",
+    date: new Date().toISOString(), // Текущая дата по умолчанию
   });
 
   const handleChange = (e) => {
     const { name, value } = e.target;
     setFormData((prev) => ({ ...prev, [name]: value }));
+  };
+
+  const handleDateChange = (newDate) => {
+    setFormData((prev) => ({ ...prev, date: newDate.toISOString() }));
   };
 
   const handleSubmit = async (e) => {
@@ -24,9 +29,13 @@ export default function PopNewCard() {
       alert("Токен отсутствует. Пожалуйста, войдите заново.");
       return;
     }
+    if (!formData.date) {
+      alert("Выберите дату исполнения");
+      return;
+    }
     try {
       await addTask(formData, token);
-      navigate(-1); // Вернуться назад
+      navigate(-1);
     } catch (error) {
       alert("Ошибка создания задачи: " + error.message);
     }
@@ -84,7 +93,10 @@ export default function PopNewCard() {
                   ></textarea>
                 </div>
               </form>
-              <Calendar />
+              <Calendar
+                selectedDate={new Date(formData.date)}
+                onDateChange={handleDateChange}
+              />
             </div>
             <div className="pop-new-card__categories categories">
               <p className="categories__p subttl">Категория</p>

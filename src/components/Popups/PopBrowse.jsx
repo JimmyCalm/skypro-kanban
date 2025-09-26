@@ -17,10 +17,10 @@ export default function PopBrowse() {
     topic: "Web Design",
     description: "",
     status: "Без статуса",
+    date: new Date().toISOString(), // По умолчанию
   });
   const [error, setError] = useState("");
 
-  
   useEffect(() => {
     const fetchTask = async () => {
       const token = JSON.parse(localStorage.getItem("userInfo"))?.token;
@@ -36,6 +36,7 @@ export default function PopBrowse() {
           topic: fetchedTask.topic || "Web Design",
           description: fetchedTask.description || "",
           status: fetchedTask.status || "Без статуса",
+          date: fetchedTask.date || new Date().toISOString(),
         });
       } catch (err) {
         setError(err.message || "Не удалось загрузить задачу");
@@ -44,13 +45,15 @@ export default function PopBrowse() {
     fetchTask();
   }, [id]);
 
-  // Обработчик изменения полей формы
   const handleChange = (e) => {
     const { name, value } = e.target;
     setFormData((prev) => ({ ...prev, [name]: value }));
   };
 
-  // Сохранение изменений
+  const handleDateChange = (newDate) => {
+    setFormData((prev) => ({ ...prev, date: newDate.toISOString() }));
+  };
+
   const handleSave = async () => {
     const token = JSON.parse(localStorage.getItem("userInfo"))?.token;
     if (!token) {
@@ -59,7 +62,7 @@ export default function PopBrowse() {
     }
     try {
       await updateTask(id, formData, token);
-      setTask({ ...task, ...formData }); // Обновляем состояние задачи
+      setTask({ ...task, ...formData });
       setIsEditing(false);
       setError("");
     } catch (err) {
@@ -67,7 +70,6 @@ export default function PopBrowse() {
     }
   };
 
-  // Удаление задачи
   const handleDelete = async () => {
     const token = JSON.parse(localStorage.getItem("userInfo"))?.token;
     if (!token) {
@@ -77,14 +79,13 @@ export default function PopBrowse() {
     if (window.confirm("Вы уверены, что хотите удалить эту задачу?")) {
       try {
         await deleteTask(id, token);
-        navigate("/"); // Возвращаемся на главную страницу
+        navigate("/");
       } catch (err) {
         setError(err.message || "Не удалось удалить задачу");
       }
     }
   };
 
-  // Переключение режима редактирования
   const handleEditToggle = () => {
     setIsEditing(!isEditing);
   };
@@ -141,7 +142,12 @@ export default function PopBrowse() {
                   ></textarea>
                 </div>
               </form>
-              <Calendar />
+              {isEditing && ( // Показываем календарь только в режиме редактирования
+                <Calendar
+                  selectedDate={new Date(formData.date)}
+                  onDateChange={handleDateChange}
+                />
+              )}
             </div>
             <div className="theme-down__categories theme-down">
               <p className="categories__p subttl">Категория</p>
