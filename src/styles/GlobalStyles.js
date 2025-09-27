@@ -290,6 +290,23 @@ body {
   letter-spacing: -0.2px;
   cursor: pointer;
 }
+.calendar__cell._active-day {
+  background-color: #565eef;
+  color: white;
+  border-radius: 50%;
+  cursor: pointer;
+}
+.calendar__cell:hover {
+  background-color: #e6e6ff;
+  cursor: pointer;
+}
+.calendar__cell._other-month {
+  color: #ccc;
+  cursor: default;
+}
+.calendar__cell._weekend {
+  color: #ff6d00; /* Красный для выходных */
+}
 .calendar__nav {
   width: 100%;
   display: flex;
@@ -351,6 +368,7 @@ body {
   border-radius: 24px;
   margin-right: 7px;
   opacity: 0.4;
+  cursor: pointer;
 }
 .categories__theme p {
   font-size: 14px;
@@ -496,6 +514,26 @@ body {
   padding: 11px 14px 10px;
   margin-right: 7px;
   margin-bottom: 7px;
+}
+.status__theme._active-status {
+  background-color: #565eef;
+  color: white;
+  border-radius: 4px;
+}
+.status__theme {
+  cursor: pointer;
+  padding: 5px 10px;
+  margin: 5px;
+  border: 1px solid #ccc;
+  border-radius: 4px;
+}
+.status__themes {
+  display: flex;
+  flex-wrap: wrap;
+}
+.status__current {
+  font-weight: bold;
+  color: #565eef;
 }
 .status__theme p {
   font-size: 14px;

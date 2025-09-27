@@ -1,5 +1,4 @@
 import Column from "../components/Column/Column";
-import { cardList } from "../data";
 import { useState, useEffect } from "react";
 import {
   MainWrapper,
@@ -7,9 +6,10 @@ import {
   MainContent,
   LoadingContainer,
 } from "../components/Main/Main.styled";
-import { Outlet } from "react-router-dom";
+import { Outlet, useNavigate } from "react-router-dom";
+import { getTasks } from "../services/kanban";
 
-export default function MainPage() {
+export default function MainPage({ setIsAuth }) {
   const statuses = [
     "Без статуса",
     "Нужно сделать",
@@ -17,34 +17,53 @@ export default function MainPage() {
     "Тестирование",
     "Готово",
   ];
+  const [tasks, setTasks] = useState([]);
   const [isLoading, setIsLoading] = useState(true);
-  // const [words, setWords] = useState([]);
-  // const [error, setError] = useState("");
-  // const getWords = useCallback(async () => {
-  //   try {
-  //     setLoading(true);
-  //     const data = await fetchWords({
-  //       // пока у нас не реализована авторизация, передаём токен вручную
-  //       token: "bgc0b8awbwas6g5g5k5o5s5w606g37w3cc3bo3b83k39s3co3c83c03ck",
-  //     });
-  //     if (data) setWords(data);
-  //   } catch (err) {
-  //     setError(err.message);
-  //   } finally {
-  //     setLoading(false);
-  //   }
-  // }, []);
-  // useEffect(() => {
-  //   getWords();
-  // }, [getWords]);
+  const navigate = useNavigate();
+
+  const formatDate = (isoDate) => {
+    if (!isoDate) return "";
+    const date = new Date(isoDate);
+    const day = String(date.getDate()).padStart(2, "0");
+    const month = String(date.getMonth() + 1).padStart(2, "0");
+    const year = String(date.getFullYear()).slice(2);
+    return `${day}.${month}.${year}`;
+  };
 
   useEffect(() => {
-    const timer = setTimeout(() => {
-      setIsLoading(false);
-    }, 1000);
+    const fetchTasks = async () => {
+      const userInfo = JSON.parse(localStorage.getItem("userInfo"));
+      const token = userInfo ? userInfo.token : null;
+      if (!token) {
+        setIsAuth(false);
+        navigate("/login");
+        return;
+      }
 
-    return () => clearTimeout(timer);
-  }, []);
+      try {
+        const fetchedTasks = await getTasks(token);
+        const formattedTasks = fetchedTasks.map((task) => ({
+          ...task,
+          date: formatDate(task.date),
+        }));
+        setTasks(formattedTasks);
+      } catch (error) {
+        console.error("Ошибка загрузки задач:", error.message);
+        if (error.message.includes("401")) {
+          localStorage.removeItem("userInfo");
+          setIsAuth(false);
+          navigate("/login");
+        } else {
+          // Дополнительная отладка для других ошибок
+          console.error("Детали ошибки:", error);
+        }
+      } finally {
+        setIsLoading(false);
+      }
+    };
+
+    fetchTasks();
+  }, [navigate, setIsAuth]);
 
   return (
     <>
@@ -59,7 +78,7 @@ export default function MainPage() {
                   <Column
                     key={status}
                     title={status}
-                    cards={cardList.filter((card) => card.status === status)}
+                    cards={tasks.filter((task) => task.status === status)}
                   />
                 ))}
               </MainContent>

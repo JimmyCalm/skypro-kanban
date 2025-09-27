@@ -13,17 +13,15 @@ export default function PopExit({ setIsAuth, onClose }) {
   const navigate = useNavigate();
 
   const handleExit = () => {
-    setIsAuth(false);
+    localStorage.removeItem("userInfo"); // Очищаем данные
+    if (setIsAuth) setIsAuth(false);
     navigate("/login", { replace: true });
+    if (onClose) onClose(); // Закрываем попап
   };
 
   const handleStay = (e) => {
     e.preventDefault();
-    if (onClose) {
-      onClose();
-    } else {
-      navigate(-1);
-    }
+    if (onClose) onClose();
   };
 
   return (

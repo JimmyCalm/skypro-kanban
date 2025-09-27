@@ -11,7 +11,7 @@ import {
 import { Link } from "react-router-dom";
 
 export default function Card({ cardData }) {
-  const { topic, title, date } = cardData;
+  const { topic, title } = cardData;
   const theme = topic.toLowerCase().replace(" ", "");
 
   return (
@@ -21,7 +21,7 @@ export default function Card({ cardData }) {
           <CardTheme theme={theme} className={`card__theme _${theme}`}>
             <p className={`_${theme}`}>{topic}</p>
           </CardTheme>
-          <CardButton as={Link} to={`/card/${cardData.id}`}>
+          <CardButton as={Link} to={`/card/${cardData._id}`}>
             <div></div>
             <div></div>
             <div></div>
@@ -60,7 +60,7 @@ export default function Card({ cardData }) {
                 </clipPath>
               </defs>
             </svg>
-            <p>{date}</p>
+            <p>{cardData.date}</p>
           </CardDate>
         </CardContent>
       </CardWrapper>

@@ -6,10 +6,23 @@ import {
   PopUserButton,
 } from "./PopUser.styled";
 import { Link } from "react-router-dom";
+import { useState } from "react";
 
-export default function PopUser({ onClose }) {
+export default function PopUser({ onClose, userName, userEmail }) {
+  const [isDarkTheme, setIsDarkTheme] = useState(
+    localStorage.getItem("theme") === "dark"
+  );
+
+  // Сохранение темы в localStorage
+  const handleThemeChange = (e) => {
+    const isDark = e.target.checked;
+    setIsDarkTheme(isDark);
+    localStorage.setItem("theme", isDark ? "dark" : "light");
+    document.body.className = isDark ? "dark" : "light"; // Пример смены темы
+  };
+
   return (
-    <PopUserWrapper id="user-set-target">
+    <PopUserWrapper id="user-set-target" className="pop-user">
       <Link
         to="#"
         onClick={(e) => {
@@ -19,19 +32,18 @@ export default function PopUser({ onClose }) {
       >
         x
       </Link>
-      <PopUserName>Ivan Ivanov</PopUserName>
-      <PopUserMail>ivan.ivanov@gmail.com</PopUserMail>
+      <PopUserName>{userName}</PopUserName>
+      <PopUserMail>{userEmail}</PopUserMail>
       <PopUserTheme>
         <p>Темная тема</p>
-        <input type="checkbox" name="checkbox" />
+        <input
+          type="checkbox"
+          name="checkbox"
+          checked={isDarkTheme}
+          onChange={handleThemeChange}
+        />
       </PopUserTheme>
-      <PopUserButton
-        type="button"
-        onClick={(e) => {
-          e.preventDefault();
-          onClose();
-        }}
-      >
+      <PopUserButton type="button">
         <Link to="/exit">Выйти</Link>
       </PopUserButton>
     </PopUserWrapper>

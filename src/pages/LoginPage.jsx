@@ -2,6 +2,8 @@ import styled from "styled-components";
 import { GlobalStyles } from "../Styles/GlobalStyles";
 import { useNavigate } from "react-router-dom";
 import { Link } from "react-router-dom";
+import { useState } from "react";
+import { loginUser } from "../services/auth";
 
 const LoginWrapper = styled.div`
   width: 100%;
@@ -58,14 +60,31 @@ const LoginDescription = styled.p`
   }
 `;
 
+const ErrorMessage = styled.p`
+  color: #ff3333;
+  font-size: 12px;
+  margin-top: 5px;
+`;
+
 export default function LoginPage({ setIsAuth }) {
   const navigate = useNavigate();
+  const [login, setLogin] = useState("");
+  const [password, setPassword] = useState("");
+  const [error, setError] = useState("");
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
-    if (setIsAuth) {
-      setIsAuth(true);
+    setError("");
+
+    try {
+      const userData = await loginUser({ login, password });
+      localStorage.setItem("userInfo", JSON.stringify(userData));
+      if (setIsAuth) {
+        setIsAuth(true);
+      }
       navigate("/");
+    } catch (err) {
+      setError(err.message || "Ошибка авторизации. Проверьте логин и пароль.");
     }
   };
 
@@ -74,8 +93,19 @@ export default function LoginPage({ setIsAuth }) {
       <GlobalStyles />
       <LoginForm onSubmit={handleSubmit}>
         <h2>Вход</h2>
-        <LoginInput type="text" placeholder="Эл.почта" />
-        <LoginInput type="password" placeholder="Пароль" />
+        <LoginInput
+          type="text"
+          placeholder="Эл.почта"
+          value={login}
+          onChange={(e) => setLogin(e.target.value)}
+        />
+        <LoginInput
+          type="password"
+          placeholder="Пароль"
+          value={password}
+          onChange={(e) => setPassword(e.target.value)}
+        />
+        {error && <ErrorMessage>{error}</ErrorMessage>}
         <LoginButton type="submit">Войти</LoginButton>
         <LoginDescription>
           Нужно зарегистрироваться?{" "}

@@ -11,7 +11,7 @@ export default function Column({ title, cards }) {
       </ColumnTitle>
       <CardsContainer className="cards">
         {filteredCards.map((card) => (
-          <Card key={card.id} cardData={card} />
+          <Card key={card._id} cardData={card} />
         ))}
       </CardsContainer>
     </ColumnWrapper>

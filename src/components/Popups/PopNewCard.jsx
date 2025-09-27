@@ -1,8 +1,45 @@
 import Calendar from "../Calendar/Calendar";
 import { useNavigate } from "react-router-dom";
+import { useState } from "react";
+import { addTask } from "../../services/kanban";
 
 export default function PopNewCard() {
   const navigate = useNavigate();
+  const [formData, setFormData] = useState({
+    title: "",
+    topic: "Web Design",
+    description: "",
+    status: "Без статуса",
+    date: new Date().toISOString(), // Текущая дата по умолчанию
+  });
+
+  const handleChange = (e) => {
+    const { name, value } = e.target;
+    setFormData((prev) => ({ ...prev, [name]: value }));
+  };
+
+  const handleDateChange = (newDate) => {
+    setFormData((prev) => ({ ...prev, date: newDate.toISOString() }));
+  };
+
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+    const token = JSON.parse(localStorage.getItem("userInfo"))?.token;
+    if (!token) {
+      alert("Токен отсутствует. Пожалуйста, войдите заново.");
+      return;
+    }
+    if (!formData.date) {
+      alert("Выберите дату исполнения");
+      return;
+    }
+    try {
+      await addTask(formData, token);
+      navigate(-1);
+    } catch (error) {
+      alert("Ошибка создания задачи: " + error.message);
+    }
+  };
 
   return (
     <div className="pop-new-card" id="popNewCard">
@@ -24,7 +61,7 @@ export default function PopNewCard() {
               <form
                 className="pop-new-card__form form-new"
                 id="formNewCard"
-                action="#"
+                onSubmit={handleSubmit}
               >
                 <div className="form-new__block">
                   <label htmlFor="formTitle" className="subttl">
@@ -33,12 +70,14 @@ export default function PopNewCard() {
                   <input
                     className="form-new__input"
                     type="text"
-                    name="name"
+                    name="title"
                     id="formTitle"
                     placeholder="Введите название задачи..."
                     autoFocus
                     autoComplete="off"
-                  ></input>
+                    value={formData.title}
+                    onChange={handleChange}
+                  />
                 </div>
                 <div className="form-new__block">
                   <label htmlFor="textArea" className="subttl">
@@ -46,29 +85,49 @@ export default function PopNewCard() {
                   </label>
                   <textarea
                     className="form-new__area"
-                    name="text"
+                    name="description"
                     id="textArea"
                     placeholder="Введите описание задачи..."
+                    value={formData.description}
+                    onChange={handleChange}
                   ></textarea>
                 </div>
               </form>
-              <Calendar />
+              <Calendar
+                selectedDate={new Date(formData.date)}
+                onDateChange={handleDateChange}
+              />
             </div>
             <div className="pop-new-card__categories categories">
               <p className="categories__p subttl">Категория</p>
               <div className="categories__themes">
-                <div className="categories__theme _web-design _active-category">
+                <div
+                  className={`categories__theme ${
+                    formData.topic === "Web Design" ? "_active-category" : ""
+                  } _web-design`}
+                  onClick={() => setFormData((prev) => ({ ...prev, topic: "Web Design" }))}
+                >
                   <p className="_web-design">Web Design</p>
                 </div>
-                <div className="categories__theme _research">
+                <div
+                  className={`categories__theme ${
+                    formData.topic === "Research" ? "_active-category" : ""
+                  } _research`}
+                  onClick={() => setFormData((prev) => ({ ...prev, topic: "Research" }))}
+                >
                   <p className="_research">Research</p>
                 </div>
-                <div className="categories__theme _copywriting">
+                <div
+                  className={`categories__theme ${
+                    formData.topic === "Copywriting" ? "_active-category" : ""
+                  } _copywriting`}
+                  onClick={() => setFormData((prev) => ({ ...prev, topic: "Copywriting" }))}
+                >
                   <p className="_copywriting">Copywriting</p>
                 </div>
               </div>
             </div>
-            <button className="form-new__create _hover01" id="btnCreate">
+            <button className="form-new__create _hover01" type="submit" form="formNewCard">
               Создать задачу
             </button>
           </div>
