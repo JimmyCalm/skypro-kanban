@@ -2,8 +2,9 @@ import styled from "styled-components";
 import { GlobalStyles } from "../Styles/GlobalStyles";
 import { useNavigate } from "react-router-dom";
 import { Link } from "react-router-dom";
-import { useState } from "react";
+import { useState, useContext } from "react";
 import { loginUser } from "../services/auth";
+import { AuthContext } from "../context/AuthContext";
 
 const LoginWrapper = styled.div`
   width: 100%;
@@ -66,10 +67,11 @@ const ErrorMessage = styled.p`
   margin-top: 5px;
 `;
 
-export default function LoginPage({ setIsAuth }) {
+export default function LoginPage() {
   const navigate = useNavigate();
-  const [login, setLogin] = useState("");
-  const [password, setPassword] = useState("");
+  const { login } = useContext(AuthContext);
+  const [formLogin, setFormLogin] = useState("");
+  const [formPassword, setFormPassword] = useState("");
   const [error, setError] = useState("");
 
   const handleSubmit = async (e) => {
@@ -77,11 +79,11 @@ export default function LoginPage({ setIsAuth }) {
     setError("");
 
     try {
-      const userData = await loginUser({ login, password });
-      localStorage.setItem("userInfo", JSON.stringify(userData));
-      if (setIsAuth) {
-        setIsAuth(true);
-      }
+      const userData = await loginUser({ 
+        login: formLogin, 
+        password: formPassword 
+      });
+      login(userData);
       navigate("/");
     } catch (err) {
       setError(err.message || "Ошибка авторизации. Проверьте логин и пароль.");
@@ -96,14 +98,14 @@ export default function LoginPage({ setIsAuth }) {
         <LoginInput
           type="text"
           placeholder="Эл.почта"
-          value={login}
-          onChange={(e) => setLogin(e.target.value)}
+          value={formLogin}
+          onChange={(e) => setFormLogin(e.target.value)}
         />
         <LoginInput
           type="password"
           placeholder="Пароль"
-          value={password}
-          onChange={(e) => setPassword(e.target.value)}
+          value={formPassword}
+          onChange={(e) => setFormPassword(e.target.value)}
         />
         {error && <ErrorMessage>{error}</ErrorMessage>}
         <LoginButton type="submit">Войти</LoginButton>

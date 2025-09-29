@@ -1,16 +1,23 @@
 import Calendar from "../Calendar/Calendar";
 import { useNavigate } from "react-router-dom";
-import { useState } from "react";
+import { useState, useContext } from "react";
 import { addTask } from "../../services/kanban";
+import { AuthContext } from "../../context/AuthContext";
+import { TaskContext } from "../../context/TaskContext";
 
 export default function PopNewCard() {
   const navigate = useNavigate();
+  const { user } = useContext(AuthContext);
+  const { addTask: addTaskToContext } = useContext(TaskContext);
+  
+  const [isSubmitting, setIsSubmitting] = useState(false);
+  
   const [formData, setFormData] = useState({
     title: "",
     topic: "Web Design",
     description: "",
     status: "Без статуса",
-    date: new Date().toISOString(), // Текущая дата по умолчанию
+    date: new Date().toISOString(),
   });
 
   const handleChange = (e) => {
@@ -22,10 +29,19 @@ export default function PopNewCard() {
     setFormData((prev) => ({ ...prev, date: newDate.toISOString() }));
   };
 
+
+  const formatDate = (isoDate) => {
+    if (!isoDate) return "";
+    const date = new Date(isoDate);
+    const day = String(date.getDate()).padStart(2, "0");
+    const month = String(date.getMonth() + 1).padStart(2, "0");
+    const year = String(date.getFullYear()).slice(2);
+    return `${day}.${month}.${year}`;
+  };
+
   const handleSubmit = async (e) => {
     e.preventDefault();
-    const token = JSON.parse(localStorage.getItem("userInfo"))?.token;
-    if (!token) {
+    if (!user?.token) {
       alert("Токен отсутствует. Пожалуйста, войдите заново.");
       return;
     }
@@ -33,11 +49,29 @@ export default function PopNewCard() {
       alert("Выберите дату исполнения");
       return;
     }
+    
     try {
-      await addTask(formData, token);
+      setIsSubmitting(true);
+
+      await addTask(formData, user.token);
+      
+
+      const tempTask = {
+        id: Date.now(),
+        title: formData.title,
+        topic: formData.topic,
+        description: formData.description,
+        status: formData.status,
+        date: formatDate(formData.date),
+      };
+      
+
+      addTaskToContext(tempTask);
       navigate(-1);
     } catch (error) {
       alert("Ошибка создания задачи: " + error.message);
+    } finally {
+      setIsSubmitting(false);
     }
   };
 
@@ -77,6 +111,7 @@ export default function PopNewCard() {
                     autoComplete="off"
                     value={formData.title}
                     onChange={handleChange}
+                    disabled={isSubmitting}
                   />
                 </div>
                 <div className="form-new__block">
@@ -90,6 +125,7 @@ export default function PopNewCard() {
                     placeholder="Введите описание задачи..."
                     value={formData.description}
                     onChange={handleChange}
+                    disabled={isSubmitting}
                   ></textarea>
                 </div>
               </form>
@@ -105,7 +141,7 @@ export default function PopNewCard() {
                   className={`categories__theme ${
                     formData.topic === "Web Design" ? "_active-category" : ""
                   } _web-design`}
-                  onClick={() => setFormData((prev) => ({ ...prev, topic: "Web Design" }))}
+                  onClick={() => !isSubmitting && setFormData((prev) => ({ ...prev, topic: "Web Design" }))}
                 >
                   <p className="_web-design">Web Design</p>
                 </div>
@@ -113,7 +149,7 @@ export default function PopNewCard() {
                   className={`categories__theme ${
                     formData.topic === "Research" ? "_active-category" : ""
                   } _research`}
-                  onClick={() => setFormData((prev) => ({ ...prev, topic: "Research" }))}
+                  onClick={() => !isSubmitting && setFormData((prev) => ({ ...prev, topic: "Research" }))}
                 >
                   <p className="_research">Research</p>
                 </div>
@@ -121,14 +157,19 @@ export default function PopNewCard() {
                   className={`categories__theme ${
                     formData.topic === "Copywriting" ? "_active-category" : ""
                   } _copywriting`}
-                  onClick={() => setFormData((prev) => ({ ...prev, topic: "Copywriting" }))}
+                  onClick={() => !isSubmitting && setFormData((prev) => ({ ...prev, topic: "Copywriting" }))}
                 >
                   <p className="_copywriting">Copywriting</p>
                 </div>
               </div>
             </div>
-            <button className="form-new__create _hover01" type="submit" form="formNewCard">
-              Создать задачу
+            <button 
+              className="form-new__create _hover01" 
+              type="submit" 
+              form="formNewCard"
+              disabled={isSubmitting}
+            >
+              {isSubmitting ? "Создание..." : "Создать задачу"}
             </button>
           </div>
         </div>

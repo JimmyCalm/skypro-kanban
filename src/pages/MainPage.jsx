@@ -1,5 +1,5 @@
 import Column from "../components/Column/Column";
-import { useState, useEffect } from "react";
+import { useContext, useEffect, useState } from "react";
 import {
   MainWrapper,
   MainBlock,
@@ -8,8 +8,10 @@ import {
 } from "../components/Main/Main.styled";
 import { Outlet, useNavigate } from "react-router-dom";
 import { getTasks } from "../services/kanban";
+import { AuthContext } from "../context/AuthContext";
+import { TaskContext } from "../context/TaskContext";
 
-export default function MainPage({ setIsAuth }) {
+export default function MainPage() {
   const statuses = [
     "Без статуса",
     "Нужно сделать",
@@ -17,9 +19,13 @@ export default function MainPage({ setIsAuth }) {
     "Тестирование",
     "Готово",
   ];
-  const [tasks, setTasks] = useState([]);
-  const [isLoading, setIsLoading] = useState(true);
+  
+  const { user, isAuth, setIsAuth } = useContext(AuthContext);
+  const { tasks, setTasks } = useContext(TaskContext);
   const navigate = useNavigate();
+  
+  const [isLoading, setIsLoading] = useState(false);
+
 
   const formatDate = (isoDate) => {
     if (!isoDate) return "";
@@ -31,17 +37,22 @@ export default function MainPage({ setIsAuth }) {
   };
 
   useEffect(() => {
-    const fetchTasks = async () => {
-      const userInfo = JSON.parse(localStorage.getItem("userInfo"));
-      const token = userInfo ? userInfo.token : null;
-      if (!token) {
-        setIsAuth(false);
-        navigate("/login");
-        return;
-      }
+    if (!isAuth) {
+      navigate("/login");
+      return;
+    }
 
+    if (!user?.token) {
+      setIsAuth(false);
+      navigate("/login");
+      return;
+    }
+
+    const fetchTasks = async () => {
       try {
-        const fetchedTasks = await getTasks(token);
+        setIsLoading(true);
+        const fetchedTasks = await getTasks(user.token);
+
         const formattedTasks = fetchedTasks.map((task) => ({
           ...task,
           date: formatDate(task.date),
@@ -49,13 +60,9 @@ export default function MainPage({ setIsAuth }) {
         setTasks(formattedTasks);
       } catch (error) {
         console.error("Ошибка загрузки задач:", error.message);
-        if (error.message.includes("401")) {
-          localStorage.removeItem("userInfo");
+        if (error.message.includes("401") || error.response?.status === 401) {
           setIsAuth(false);
           navigate("/login");
-        } else {
-          // Дополнительная отладка для других ошибок
-          console.error("Детали ошибки:", error);
         }
       } finally {
         setIsLoading(false);
@@ -63,7 +70,7 @@ export default function MainPage({ setIsAuth }) {
     };
 
     fetchTasks();
-  }, [navigate, setIsAuth]);
+  }, [isAuth, user?.token, navigate, setIsAuth, setTasks]);
 
   return (
     <>
