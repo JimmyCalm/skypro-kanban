@@ -25,7 +25,7 @@ export default function MainPage() {
   const navigate = useNavigate();
   
   const [isLoading, setIsLoading] = useState(false);
-
+  const [hasLoaded, setHasLoaded] = useState(false);
 
   const formatDate = (isoDate) => {
     if (!isoDate) return "";
@@ -37,10 +37,12 @@ export default function MainPage() {
   };
 
   useEffect(() => {
+
     if (!isAuth) {
       navigate("/login");
       return;
     }
+
 
     if (!user?.token) {
       setIsAuth(false);
@@ -48,16 +50,21 @@ export default function MainPage() {
       return;
     }
 
+
     const fetchTasks = async () => {
       try {
-        setIsLoading(true);
-        const fetchedTasks = await getTasks(user.token);
 
+        if (!hasLoaded) {
+          setIsLoading(true);
+        }
+        
+        const fetchedTasks = await getTasks(user.token);
         const formattedTasks = fetchedTasks.map((task) => ({
           ...task,
           date: formatDate(task.date),
         }));
         setTasks(formattedTasks);
+        setHasLoaded(true);
       } catch (error) {
         console.error("Ошибка загрузки задач:", error.message);
         if (error.message.includes("401") || error.response?.status === 401) {
@@ -69,8 +76,11 @@ export default function MainPage() {
       }
     };
 
-    fetchTasks();
-  }, [isAuth, user?.token, navigate, setIsAuth, setTasks]);
+
+    if (!hasLoaded || (user?.token && hasLoaded)) {
+      fetchTasks();
+    }
+  }, [isAuth, user.token, navigate, setIsAuth, setTasks, hasLoaded]);
 
   return (
     <>
