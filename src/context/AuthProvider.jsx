@@ -4,7 +4,6 @@ import { AuthContext } from "./AuthContext";
 export default function AuthProvider({ children }) {
   const [user, setUser] = useState(null);
   const [isAuth, setIsAuth] = useState(false);
-  const [isLoading, setIsLoading] = useState(true);
 
 
   useEffect(() => {
@@ -13,7 +12,6 @@ export default function AuthProvider({ children }) {
       setUser(userInfo);
       setIsAuth(true);
     }
-    setIsLoading(false);
   }, []);
 
 
@@ -35,8 +33,7 @@ export default function AuthProvider({ children }) {
     isAuth,
     login,
     logout,
-    setIsAuth,
-    isLoading
+    setIsAuth
   };
 
   return (

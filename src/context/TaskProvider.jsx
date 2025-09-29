@@ -3,7 +3,6 @@ import { TaskContext } from "./TaskContext";
 
 export default function TaskProvider({ children }) {
   const [tasks, setTasks] = useState([]);
-  const [isTasksLoading, setIsTasksLoading] = useState(false);
 
   const setTasksData = useCallback((newTasks) => {
     setTasks(newTasks);
@@ -29,8 +28,6 @@ export default function TaskProvider({ children }) {
     addTask,
     updateTask,
     deleteTask,
-    isTasksLoading,
-    setIsTasksLoading
   };
 
   return (

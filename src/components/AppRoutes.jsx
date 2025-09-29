@@ -11,13 +11,8 @@ import PopNewCardPage from "../pages/PopNewCardPage";
 import Layout from "./Layout";
 
 function ProtectedRoute({ children }) {
-  const { isAuth, isLoading } = useContext(AuthContext);
-  
-
-  if (isLoading) {
-    return <div>Загрузка...</div>;
-  }
-  
+  const { isAuth } = useContext(AuthContext);
+ 
   return isAuth ? children : <Navigate to="/login" replace />;
 }
 
