@@ -1,4 +1,6 @@
 import { useNavigate } from "react-router-dom";
+import { useContext } from "react";
+import { AuthContext } from "../../context/AuthContext";
 import {
   PopExitWrapper,
   PopExitContainer,
@@ -9,14 +11,14 @@ import {
   PopExitButtonNo,
 } from "./PopExit.styled";
 
-export default function PopExit({ setIsAuth, onClose }) {
+export default function PopExit({ onClose }) {
   const navigate = useNavigate();
+  const { logout } = useContext(AuthContext);
 
   const handleExit = () => {
-    localStorage.removeItem("userInfo"); // Очищаем данные
-    if (setIsAuth) setIsAuth(false);
+    logout();
     navigate("/login", { replace: true });
-    if (onClose) onClose(); // Закрываем попап
+    if (onClose) onClose();
   };
 
   const handleStay = (e) => {

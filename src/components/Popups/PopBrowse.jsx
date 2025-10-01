@@ -1,17 +1,23 @@
 import Calendar from "../Calendar/Calendar";
 import { useNavigate, useParams } from "react-router-dom";
-import { useState, useEffect } from "react";
+import { useState, useEffect, useContext } from "react";
 import {
   getTaskById,
   updateTask,
   deleteTask,
 } from "../../services/kanban";
+import { AuthContext } from "../../context/AuthContext";
+import { TaskContext } from "../../context/TaskContext";
 
 export default function PopBrowse() {
   const { id } = useParams();
   const navigate = useNavigate();
+  const { user } = useContext(AuthContext);
+  const { updateTask: updateTaskInContext, deleteTask: deleteTaskInContext } = useContext(TaskContext);
+  
   const [task, setTask] = useState(null);
   const [isEditing, setIsEditing] = useState(false);
+  const [isSubmitting, setIsSubmitting] = useState(false);
   const [formData, setFormData] = useState({
     title: "",
     topic: "Web Design",
@@ -29,15 +35,23 @@ export default function PopBrowse() {
     "Готово",
   ];
 
+  const formatDate = (isoDate) => {
+    if (!isoDate) return "";
+    const date = new Date(isoDate);
+    const day = String(date.getDate()).padStart(2, "0");
+    const month = String(date.getMonth() + 1).padStart(2, "0");
+    const year = String(date.getFullYear()).slice(2);
+    return `${day}.${month}.${year}`;
+  };
+
   useEffect(() => {
     const fetchTask = async () => {
-      const token = JSON.parse(localStorage.getItem("userInfo"))?.token;
-      if (!token) {
+      if (!user?.token) {
         setError("Токен отсутствует. Пожалуйста, войдите заново.");
         return;
       }
       try {
-        const fetchedTask = await getTaskById(id, token);
+        const fetchedTask = await getTaskById(id, user.token);
         setTask(fetchedTask);
         setFormData({
           title: fetchedTask.title || "",
@@ -51,7 +65,7 @@ export default function PopBrowse() {
       }
     };
     fetchTask();
-  }, [id]);
+  }, [id, user]);
 
   const handleChange = (e) => {
     const { name, value } = e.target;
@@ -67,8 +81,7 @@ export default function PopBrowse() {
   };
 
   const handleSave = async () => {
-    const token = JSON.parse(localStorage.getItem("userInfo"))?.token;
-    if (!token) {
+    if (!user?.token) {
       setError("Токен отсутствует. Пожалуйста, войдите заново.");
       return;
     }
@@ -77,33 +90,50 @@ export default function PopBrowse() {
       return;
     }
     try {
-      await updateTask(id, formData, token);
-      setTask({ ...task, ...formData });
+      setIsSubmitting(true);
+
+      await updateTask(id, formData, user.token);
+      
+      const updatedTask = {
+        ...formData,
+        id: parseInt(id),
+        date: formatDate(formData.date) 
+      };
+      
+      updateTaskInContext(parseInt(id), updatedTask);
+      setTask(updatedTask);
       setIsEditing(false);
       setError("");
     } catch (err) {
       setError(err.message || "Не удалось обновить задачу");
+    } finally {
+      setIsSubmitting(false);
     }
   };
 
   const handleDelete = async () => {
-    const token = JSON.parse(localStorage.getItem("userInfo"))?.token;
-    if (!token) {
+    if (!user?.token) {
       setError("Токен отсутствует. Пожалуйста, войдите заново.");
       return;
     }
     if (window.confirm("Вы уверены, что хотите удалить эту задачу?")) {
       try {
-        await deleteTask(id, token);
+        setIsSubmitting(true);
+        await deleteTask(id, user.token);
+        deleteTaskInContext(parseInt(id));
         navigate("/");
       } catch (err) {
         setError(err.message || "Не удалось удалить задачу");
+      } finally {
+        setIsSubmitting(false);
       }
     }
   };
 
   const handleEditToggle = () => {
-    setIsEditing(!isEditing);
+    if (!isSubmitting) {
+      setIsEditing(!isEditing);
+    }
   };
 
   if (!task) {
@@ -131,7 +161,7 @@ export default function PopBrowse() {
                       className={`status__theme ${
                         formData.status === status ? "_active-status" : ""
                       }`}
-                      onClick={() => handleStatusChange(status)}
+                      onClick={() => !isSubmitting && handleStatusChange(status)}
                     >
                       <p>{status}</p>
                     </div>
@@ -156,7 +186,7 @@ export default function PopBrowse() {
                     placeholder="Введите описание задачи..."
                     value={formData.description}
                     onChange={handleChange}
-                    readOnly={!isEditing}
+                    readOnly={!isEditing || isSubmitting}
                   ></textarea>
                 </div>
               </form>
@@ -175,35 +205,57 @@ export default function PopBrowse() {
             </div>
             <div className={`pop-browse__btn-browse ${isEditing ? "_hide" : ""}`}>
               <div className="btn-group">
-                <button className="btn-browse__edit _btn-bor _hover03" onClick={handleEditToggle}>
+                <button 
+                  className="btn-browse__edit _btn-bor _hover03" 
+                  onClick={handleEditToggle}
+                  disabled={isSubmitting}
+                >
                   Редактировать задачу
                 </button>
-                <button className="btn-browse__delete _btn-bor _hover03" onClick={handleDelete}>
+                <button 
+                  className="btn-browse__delete _btn-bor _hover03" 
+                  onClick={handleDelete}
+                  disabled={isSubmitting}
+                >
                   Удалить задачу
                 </button>
               </div>
               <button
                 className="btn-browse__close _btn-bg _hover01"
                 onClick={() => navigate(-1)}
+                disabled={isSubmitting}
               >
                 Закрыть
               </button>
             </div>
             <div className={`pop-browse__btn-edit ${!isEditing ? "_hide" : ""}`}>
               <div className="btn-group">
-                <button className="btn-edit__edit _btn-bg _hover01" onClick={handleSave}>
-                  Сохранить
+                <button 
+                  className="btn-edit__edit _btn-bg _hover01" 
+                  onClick={handleSave}
+                  disabled={isSubmitting}
+                >
+                  {isSubmitting ? "Сохранение..." : "Сохранить"}
                 </button>
-                <button className="btn-edit__edit _btn-bor _hover03" onClick={handleEditToggle}>
+                <button 
+                  className="btn-edit__edit _btn-bor _hover03" 
+                  onClick={handleEditToggle}
+                  disabled={isSubmitting}
+                >
                   Отменить
                 </button>
-                <button className="btn-edit__delete _btn-bor _hover03" onClick={handleDelete}>
+                <button 
+                  className="btn-edit__delete _btn-bor _hover03" 
+                  onClick={handleDelete}
+                  disabled={isSubmitting}
+                >
                   Удалить задачу
                 </button>
               </div>
               <button
                 className="btn-edit__close _btn-bg _hover01"
                 onClick={() => navigate(-1)}
+                disabled={isSubmitting}
               >
                 Закрыть
               </button>

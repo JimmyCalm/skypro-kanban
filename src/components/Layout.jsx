@@ -1,19 +1,18 @@
 import { Outlet, useLocation } from "react-router-dom";
+import { useContext } from "react";
+import { AuthContext } from "../context/AuthContext";
 import Header from "./Header/Header";
 
-function Layout({ setIsAuth }) {
+function Layout() {
   const location = useLocation();
+  const { logout } = useContext(AuthContext);
+  
   const hideHeader =
     location.pathname === "/login" || location.pathname === "/register";
 
-  const handleLogout = () => {
-    localStorage.removeItem("userInfo");
-    if (setIsAuth) setIsAuth(false);
-  };
-
   return (
     <div className="wrapper">
-      {!hideHeader && <Header onLogout={handleLogout} />}
+      {!hideHeader && <Header onLogout={logout} />}
       <Outlet />
     </div>
   );

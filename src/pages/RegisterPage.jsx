@@ -1,8 +1,9 @@
 import styled from "styled-components";
 import { GlobalStyles } from "../Styles/GlobalStyles";
 import { Link, useNavigate } from "react-router-dom";
-import { useState } from "react";
+import { useState, useContext } from "react";
 import { registerUser } from "../services/auth";
+import { AuthContext } from "../context/AuthContext";
 
 const RegisterWrapper = styled.div`
   width: 100%;
@@ -66,8 +67,9 @@ const ErrorMessage = styled.p`
   margin-top: 5px;
 `;
 
-export default function RegisterPage({ setIsAuth }) {
+export default function RegisterPage() {
   const navigate = useNavigate();
+  const { login } = useContext(AuthContext);
 
   const [formData, setFormData] = useState({
     name: "",
@@ -90,10 +92,7 @@ export default function RegisterPage({ setIsAuth }) {
 
     try {
       const user = await registerUser(formData);
-      localStorage.setItem("userInfo", JSON.stringify(user));
-      if (setIsAuth) {
-        setIsAuth(true);
-      }
+      login(user);
       navigate("/");
     } catch (err) {
       setError(err.message || "Ошибка регистрации. Проверьте данные и попробуйте снова.");
