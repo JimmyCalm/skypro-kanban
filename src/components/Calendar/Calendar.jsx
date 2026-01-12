@@ -4,7 +4,6 @@ export default function Calendar({ selectedDate, onDateChange }) {
   const [currentDate, setCurrentDate] = useState(new Date());
   const [formattedSelectedDate, setFormattedSelectedDate] = useState("");
 
-  // Форматирование даты в DD.MM.YY
   const formatDate = (date) => {
     if (!date) return "";
     const day = String(date.getDate()).padStart(2, "0");
@@ -13,33 +12,28 @@ export default function Calendar({ selectedDate, onDateChange }) {
     return `${day}.${month}.${year}`;
   };
 
-  // Обновление отображаемой даты при изменении selectedDate
   useEffect(() => {
     setFormattedSelectedDate(formatDate(selectedDate));
   }, [selectedDate]);
 
-  // Навигация: предыдущий месяц
   const prevMonth = () => {
     const newDate = new Date(currentDate);
     newDate.setMonth(newDate.getMonth() - 1);
     setCurrentDate(newDate);
   };
 
-  // Навигация: следующий месяц
   const nextMonth = () => {
     const newDate = new Date(currentDate);
     newDate.setMonth(newDate.getMonth() + 1);
     setCurrentDate(newDate);
   };
 
-  // Генерация дней месяца
   const generateDays = () => {
     const days = [];
     const firstDay = new Date(currentDate.getFullYear(), currentDate.getMonth(), 1).getDay();
     const daysInMonth = new Date(currentDate.getFullYear(), currentDate.getMonth() + 1, 0).getDate();
     const prevMonthDays = new Date(currentDate.getFullYear(), currentDate.getMonth(), 0).getDate();
 
-    // Заполнение дней предыдущего месяца
     for (let i = firstDay - 1; i >= 0; i--) {
       days.push({
         day: prevMonthDays - i,
@@ -48,7 +42,6 @@ export default function Calendar({ selectedDate, onDateChange }) {
       });
     }
 
-    // Дни текущего месяца
     for (let day = 1; day <= daysInMonth; day++) {
       const date = new Date(currentDate.getFullYear(), currentDate.getMonth(), day);
       const isWeekend = date.getDay() === 5 || date.getDay() === 6;
@@ -64,8 +57,7 @@ export default function Calendar({ selectedDate, onDateChange }) {
       });
     }
 
-    // Заполнение дней следующего месяца
-    while (days.length < 42) { // 6 недель максимум
+    while (days.length < 42) { 
       const nextDay = days.length - (firstDay - 1) - daysInMonth + 1;
       days.push({
         day: nextDay,
@@ -77,11 +69,10 @@ export default function Calendar({ selectedDate, onDateChange }) {
     return days;
   };
 
-  // Выбор даты
   const handleDateClick = (day, type) => {
-    if (type === "_other-month") return; // Игнорируем другие месяцы
+    if (type === "_other-month") return; 
     const newDate = new Date(currentDate.getFullYear(), currentDate.getMonth(), day);
-    onDateChange(newDate); // Вызываем колбэк для обновления формы
+    onDateChange(newDate); 
   };
 
   const days = generateDays();

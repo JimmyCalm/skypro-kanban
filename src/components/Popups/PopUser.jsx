@@ -13,12 +13,11 @@ export default function PopUser({ onClose, userName, userEmail }) {
     localStorage.getItem("theme") === "dark"
   );
 
-  // Сохранение темы в localStorage
   const handleThemeChange = (e) => {
     const isDark = e.target.checked;
     setIsDarkTheme(isDark);
     localStorage.setItem("theme", isDark ? "dark" : "light");
-    document.body.className = isDark ? "dark" : "light"; // Пример смены темы
+    document.body.className = isDark ? "dark" : "light"; 
   };
 
   return (

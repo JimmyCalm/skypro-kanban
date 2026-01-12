@@ -9,7 +9,6 @@ const getAuthHeaders = (token) => ({
   },
 });
 
-// Получение списка задач
 export const getTasks = async (token) => {
   try {
     const response = await axios.get(`${BASE_URL}kanban`, getAuthHeaders(token));
@@ -24,7 +23,6 @@ export const getTasks = async (token) => {
   }
 };
 
-// Получение задачи по ID
 export const getTaskById = async (id, token) => {
   try {
     const response = await axios.get(`${BASE_URL}kanban/${id}`, getAuthHeaders(token));
@@ -36,7 +34,6 @@ export const getTaskById = async (id, token) => {
   }
 };
 
-// Добавление новой задачи
 export const addTask = async (taskData, token) => {
   try {
     const response = await axios.post(`${BASE_URL}kanban`, taskData, getAuthHeaders(token));
@@ -48,7 +45,6 @@ export const addTask = async (taskData, token) => {
   }
 };
 
-// Обновление задачи
 export const updateTask = async (id, taskData, token) => {
   try {
     const response = await axios.put(`${BASE_URL}kanban/${id}`, taskData, getAuthHeaders(token));
@@ -60,7 +56,6 @@ export const updateTask = async (id, taskData, token) => {
   }
 };
 
-// Удаление задачи
 export const deleteTask = async (id, token) => {
   try {
     const response = await axios.delete(`${BASE_URL}kanban/${id}`, getAuthHeaders(token));

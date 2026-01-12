@@ -15,7 +15,6 @@ export default function Header({ onLogout }) {
   const [userName, setUserName] = useState("Гость");
   const [userEmail, setUserEmail] = useState("");
 
-  // Получение данных пользователя из localStorage
   useEffect(() => {
     const userInfo = JSON.parse(localStorage.getItem("userInfo"));
     if (userInfo) {
@@ -24,12 +23,10 @@ export default function Header({ onLogout }) {
     }
   }, []);
 
-  // Переключение попапа
   const toggleUserPopup = () => {
     setIsUserPopupOpen(!isUserPopupOpen);
   };
 
-  // Закрытие попапа при клике вне или по Esc
   useEffect(() => {
     const handleClickOutside = (e) => {
       if (isUserPopupOpen && !e.target.closest(".pop-user")) {
@@ -49,7 +46,6 @@ export default function Header({ onLogout }) {
     };
   }, [isUserPopupOpen]);
 
-  // Проверка авторизации
   const isAuthenticated = !!localStorage.getItem("userInfo");
 
   return (
