@@ -1,99 +1,67 @@
-import { Link } from "react-router-dom";
-import { useState, useEffect } from "react";
-import PopUser from "../Popups/PopUser";
+import React, { useState, useContext } from "react";
+import { useNavigate, Link } from "react-router-dom";
+import PopUser from "../popups/PopUser/PopUser";
+import { ThemeContext } from "../../contexts/ThemeContext";
 import {
-  HeaderWrapper,
   HeaderBlock,
+  HeaderContent,
   HeaderLogo,
   HeaderNav,
-  HeaderButtonNew,
+  HeaderButton,
   HeaderUser,
 } from "./Header.styled";
 
-export default function Header({ onLogout }) {
+import logo from "../../assets/logo.png";
+import logo_dark from "../../assets/logo_dark.png";
+
+function Header() {
   const [isUserPopupOpen, setIsUserPopupOpen] = useState(false);
-  const [userName, setUserName] = useState("Гость");
-  const [userEmail, setUserEmail] = useState("");
+  const navigate = useNavigate();
+  const { theme } = useContext(ThemeContext);
 
-  // Получение данных пользователя из localStorage
-  useEffect(() => {
-    const userInfo = JSON.parse(localStorage.getItem("userInfo"));
-    if (userInfo) {
-      setUserName(userInfo.name || "Гость");
-      setUserEmail(userInfo.login || "");
-    }
-  }, []);
-
-  // Переключение попапа
   const toggleUserPopup = () => {
-    setIsUserPopupOpen(!isUserPopupOpen);
+    setIsUserPopupOpen((prev) => !prev);
   };
 
-  // Закрытие попапа при клике вне или по Esc
-  useEffect(() => {
-    const handleClickOutside = (e) => {
-      if (isUserPopupOpen && !e.target.closest(".pop-user")) {
-        setIsUserPopupOpen(false);
-      }
-    };
-    const handleEsc = (e) => {
-      if (e.key === "Escape" && isUserPopupOpen) {
-        setIsUserPopupOpen(false);
-      }
-    };
-    document.addEventListener("mousedown", handleClickOutside);
-    document.addEventListener("keydown", handleEsc);
-    return () => {
-      document.removeEventListener("mousedown", handleClickOutside);
-      document.removeEventListener("keydown", handleEsc);
-    };
-  }, [isUserPopupOpen]);
+  const userName =
+    JSON.parse(localStorage.getItem("userInfo") || "{}").name || "Пользователь";
 
-  // Проверка авторизации
-  const isAuthenticated = !!localStorage.getItem("userInfo");
+  const logoSrc =
+    theme === "dark" ? logo_dark : logo;
 
   return (
-    <HeaderWrapper className="header">
+    <HeaderBlock>
       <div className="container">
-        <HeaderBlock>
-          <HeaderLogo className="_show _light">
-            <Link to="/">
-              <img src="../public/images/logo.png" alt="logo" />
-            </Link>
-          </HeaderLogo>
-          <HeaderLogo className="_dark">
-            <Link to="/">
-              <img src="../public/images/logo_dark.png" alt="logo" />
+        <HeaderContent>
+          <HeaderLogo>
+            <Link to="/" target="_self">
+              <img src={logoSrc} alt="logo" />
             </Link>
           </HeaderLogo>
           <HeaderNav>
-            {isAuthenticated && (
-              <HeaderButtonNew id="btnMainNew">
-                <Link to="/new">Создать новую задачу</Link>
-              </HeaderButtonNew>
-            )}
-            {isAuthenticated && (
-              <HeaderUser
-                href="#user-set-target"
-                onClick={(e) => {
-                  e.preventDefault();
-                  toggleUserPopup();
-                }}
-              >
-                {userName}
-              </HeaderUser>
-            )}
-            {isUserPopupOpen && (
-              <PopUser
-                onClose={toggleUserPopup}
-                userName={userName}
-                userEmail={userEmail}
-                onLogout={onLogout}
-              />
-            )}
+            <HeaderButton
+              className="_hover01"
+              id="btnMainNew"
+              onClick={() => navigate("new-card")}
+            >
+              Создать новую задачу
+            </HeaderButton>
+            <HeaderUser
+              href="#user-set-target"
+              className="_hover02"
+              onClick={(e) => {
+                e.preventDefault();
+                toggleUserPopup();
+              }}
+            >
+              {userName}
+            </HeaderUser>
+            <PopUser $isVisible={isUserPopupOpen} onClose={toggleUserPopup} />
           </HeaderNav>
-        </HeaderBlock>
+        </HeaderContent>
       </div>
-    </HeaderWrapper>
+    </HeaderBlock>
   );
 }
+
+export default Header;

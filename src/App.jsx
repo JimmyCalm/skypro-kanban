@@ -1,18 +1,31 @@
+import React from "react";
+import { Wrapper } from "./styles/Wrapper.styled";
 import AppRoutes from "./components/AppRoutes";
-import { GlobalStyles } from "./Styles/GlobalStyles";
-import AuthProvider from "./context/AuthProvider";
-import TaskProvider from "./context/TaskProvider";
+import { AuthProvider } from "./contexts/AuthContext";
+import { TaskProvider } from "./contexts/TaskContext";
+import { ToastContainer } from "react-toastify";
 
 function App() {
   return (
-    <>
-      <GlobalStyles />
-      <AuthProvider>
-        <TaskProvider>
+    <AuthProvider>
+      <TaskProvider>
+        <Wrapper>
           <AppRoutes />
-        </TaskProvider>
-      </AuthProvider>
-    </>
+          <ToastContainer
+            position="top-right"
+            autoClose={3000}
+            hideProgressBar={false}
+            newestOnTop={false}
+            closeOnClick
+            rtl={false}
+            pauseOnFocusLoss
+            draggable
+            pauseOnHover
+            theme="light"
+          />
+        </Wrapper>
+      </TaskProvider>
+    </AuthProvider>
   );
 }
 
