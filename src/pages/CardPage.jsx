@@ -11,14 +11,13 @@ function CardPage() {
 
   const task = useMemo(() => {
     if (!tasks.length) return null;
-
-    return tasks.find(
-      (t) =>
-        String(t.id) === String(id) ||
-        String(t._id) === String(id) ||
-        String(t.taskId) === String(id) ||
-        String(t.uuid) === String(id)
-    );
+    
+    const taskMap = new Map();
+    tasks.forEach(t => {
+      if (t.id) taskMap.set(t.id, t);
+    });
+    
+    return taskMap.get(id) || null;
   }, [tasks, id]);
 
   useEffect(() => {

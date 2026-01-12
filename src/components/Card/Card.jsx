@@ -17,11 +17,11 @@ export const formatDisplayDate = (date) => {
   }
 
   try {
-    const d = new Date(date);
-    if (isNaN(d)) return "";
-    const day = String(d.getDate()).padStart(2, "0");
-    const month = String(d.getMonth() + 1).padStart(2, "0");
-    const year = d.getFullYear();
+    const dateObj = new Date(date);
+    if (isNaN(dateObj)) return "";
+    const day = String(dateObj.getDate()).padStart(2, "0");
+    const month = String(dateObj.getMonth() + 1).padStart(2, "0");
+    const year = dateObj.getFullYear();
     return `${day}.${month}.${year}`;
   } catch (error) {
     console.error("Ошибка форматирования даты:", error);
@@ -51,13 +51,16 @@ function Card({ card }) {
 
   if (!card) return null;
 
-  const handleCardClick = (e) => {
-    e.stopPropagation();
-    const cardId = card.id ?? card._id ?? card.taskId ?? card.uuid;
+  const handleCardClick = (event) => {
+    event.stopPropagation();
+    
+    const cardId = card._id || card.id;
+    
     if (!cardId) {
       console.warn("Карточка без id:", card);
       return;
     }
+    
     navigate(`/card/${cardId}`);
   };
 

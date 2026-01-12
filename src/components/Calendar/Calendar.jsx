@@ -86,7 +86,8 @@ function Calendar({ value, onChange, isDisabled = false }) {
     if (isDisabled) return;
     setSelectedDate(date);
     if (onChange) {
-      onChange(date.toISOString());
+      // Возвращаем дату в формате ДД.ММ.ГГГГ вместо ISO строки
+      onChange(formatDate(date));
     }
   };
 

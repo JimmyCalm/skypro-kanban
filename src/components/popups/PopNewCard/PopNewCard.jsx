@@ -54,26 +54,47 @@ function PopNewCard({ onClose }) {
   const [title, setTitle] = useState("");
   const [description, setDescription] = useState("");
   const [date, setDate] = useState("");
-  const [error, setError] = useState("");
-
+  const [errors, setErrors] = useState({});
+  
   const { createTask, operationLoading } = useTasks();
   const navigate = useNavigate();
 
-  const handleClose = () => {
-    if (onClose) {
-      onClose();
-    } else {
-      navigate(-1);
+  const validateForm = () => {
+    const newErrors = {};
+    
+    if (!title.trim()) {
+      newErrors.title = "Введите название задачи";
     }
+    
+    if (!date.trim()) {
+      newErrors.date = "Выберите дату";
+    } else {
+      const dateRegex = /^\d{2}\.\d{2}\.\d{4}$/;
+      if (!dateRegex.test(date)) {
+        newErrors.date = "Неверный формат даты. Используйте ДД.ММ.ГГГГ";
+      } else {
+        const [day, month, year] = date.split('.');
+        const dateObj = new Date(year, month - 1, day);
+        if (isNaN(dateObj.getTime())) {
+          newErrors.date = "Неверная дата";
+        }
+      }
+    }
+    
+    if (!category.trim()) {
+      newErrors.category = "Выберите категорию";
+    }
+    
+    setErrors(newErrors);
+    return Object.keys(newErrors).length === 0;
   };
 
   const handleCreate = async () => {
-    if (!title.trim()) {
-      setError("Введите название задачи");
+    if (!validateForm()) {
       return;
     }
 
-    setError("");
+    setErrors({});
 
     try {
       const newTask = {
@@ -86,28 +107,35 @@ function PopNewCard({ onClose }) {
 
       console.log("Создание задачи:", newTask);
 
-      // Задача добавится в UI моментально (оптимистичное обновление)
       await createTask(newTask);
 
-      // Очищаем форму
       setTitle("");
       setDescription("");
       setDate("");
       setCategory("Web Design");
+      setErrors({});
 
-      // Закрываем попап
       handleClose();
     } catch (error) {
       console.error("Ошибка создания задачи:", error);
-      setError(
-        "Не удалось создать задачу: " + (error.message || "Неизвестная ошибка")
-      );
+      setErrors({ 
+        general: "Не удалось создать задачу: " + (error.message || "Неизвестная ошибка") 
+      });
+    }
+  };
+
+  const handleClose = () => {
+    setErrors({});
+    if (onClose) {
+      onClose();
+    } else {
+      navigate(-1);
     }
   };
 
   const isLoading = operationLoading;
+  const isFormValid = title.trim() && date.trim() && category.trim();
 
-  // Получаем класс для стилизации категории
   const getCategoryClass = (cat) => {
     switch (cat) {
       case "Web Design":
@@ -129,7 +157,7 @@ function PopNewCard({ onClose }) {
             <PopNewCardTitle>Создание задачи</PopNewCardTitle>
             <PopNewCardClose onClick={handleClose}>&#10006;</PopNewCardClose>
 
-            {error && (
+            {errors.general && (
               <div
                 style={{
                   color: "#ff4444",
@@ -140,7 +168,7 @@ function PopNewCard({ onClose }) {
                   fontSize: "14px",
                 }}
               >
-                {error}
+                {errors.general}
               </div>
             )}
 
@@ -155,10 +183,30 @@ function PopNewCard({ onClose }) {
                     placeholder="Введите название задачи..."
                     autoFocus
                     value={title}
-                    onChange={(e) => setTitle(e.target.value)}
+                    onChange={(e) => {
+                      setTitle(e.target.value);
+                      if (errors.title) {
+                        setErrors(prev => ({ ...prev, title: undefined }));
+                      }
+                    }}
                     disabled={isLoading}
+                    style={{ 
+                      borderColor: errors.title ? "#ff4444" : "",
+                      marginBottom: errors.title ? "5px" : "20px"
+                    }}
                   />
+                  {errors.title && (
+                    <div style={{ 
+                      color: "#ff4444", 
+                      fontSize: "12px", 
+                      marginTop: "-15px",
+                      marginBottom: "15px"
+                    }}>
+                      {errors.title}
+                    </div>
+                  )}
                 </FormNewBlock>
+                
                 <FormNewBlock>
                   <Subtitle htmlFor="textArea">Описание задачи</Subtitle>
                   <FormNewArea
@@ -171,16 +219,55 @@ function PopNewCard({ onClose }) {
                   />
                 </FormNewBlock>
               </PopNewCardForm>
-              <Calendar value={date} onChange={setDate} disabled={isLoading} />
+              
+              <div style={{ flex: 1, marginLeft: "20px" }}>
+                <Subtitle style={{ marginBottom: "10px" }}>Дата завершения</Subtitle>
+                <Calendar 
+                  value={date} 
+                  onChange={(value) => {
+                    setDate(value);
+                    if (errors.date) {
+                      setErrors(prev => ({ ...prev, date: undefined }));
+                    }
+                  }} 
+                  disabled={isLoading}
+                />
+                {errors.date && (
+                  <div style={{ 
+                    color: "#ff4444", 
+                    fontSize: "12px", 
+                    marginTop: "10px"
+                  }}>
+                    {errors.date}
+                  </div>
+                )}
+              </div>
             </PopNewCardWrap>
+            
             <Categories>
               <CategoriesP>Выберите категорию</CategoriesP>
+              {errors.category && (
+                <div style={{ 
+                  color: "#ff4444", 
+                  fontSize: "12px", 
+                  marginBottom: "5px"
+                }}>
+                  {errors.category}
+                </div>
+              )}
               <CategoriesThemes>
                 <CategoriesTheme
                   className={`${getCategoryClass("Web Design")} ${
                     category === "Web Design" ? "_active-category" : ""
                   }`}
-                  onClick={() => !isLoading && setCategory("Web Design")}
+                  onClick={() => {
+                    if (!isLoading) {
+                      setCategory("Web Design");
+                      if (errors.category) {
+                        setErrors(prev => ({ ...prev, category: undefined }));
+                      }
+                    }
+                  }}
                   style={{
                     cursor: isLoading ? "not-allowed" : "pointer",
                     opacity: category === "Web Design" ? 1 : 0.4,
@@ -192,7 +279,14 @@ function PopNewCard({ onClose }) {
                   className={`${getCategoryClass("Research")} ${
                     category === "Research" ? "_active-category" : ""
                   }`}
-                  onClick={() => !isLoading && setCategory("Research")}
+                  onClick={() => {
+                    if (!isLoading) {
+                      setCategory("Research");
+                      if (errors.category) {
+                        setErrors(prev => ({ ...prev, category: undefined }));
+                      }
+                    }
+                  }}
                   style={{
                     cursor: isLoading ? "not-allowed" : "pointer",
                     opacity: category === "Research" ? 1 : 0.4,
@@ -204,7 +298,14 @@ function PopNewCard({ onClose }) {
                   className={`${getCategoryClass("Copywriting")} ${
                     category === "Copywriting" ? "_active-category" : ""
                   }`}
-                  onClick={() => !isLoading && setCategory("Copywriting")}
+                  onClick={() => {
+                    if (!isLoading) {
+                      setCategory("Copywriting");
+                      if (errors.category) {
+                        setErrors(prev => ({ ...prev, category: undefined }));
+                      }
+                    }
+                  }}
                   style={{
                     cursor: isLoading ? "not-allowed" : "pointer",
                     opacity: category === "Copywriting" ? 1 : 0.4,
@@ -214,12 +315,16 @@ function PopNewCard({ onClose }) {
                 </CategoriesTheme>
               </CategoriesThemes>
             </Categories>
+            
             <FormNewCreate
               className="_hover01"
               id="btnCreate"
               onClick={handleCreate}
-              disabled={isLoading || !title.trim()}
-              style={{ opacity: isLoading ? 0.7 : 1 }}
+              disabled={isLoading || !isFormValid}
+              style={{ 
+                opacity: (isLoading || !isFormValid) ? 0.7 : 1,
+                cursor: (isLoading || !isFormValid) ? "not-allowed" : "pointer"
+              }}
             >
               {isLoading ? "Создание..." : "Создать задачу"}
             </FormNewCreate>

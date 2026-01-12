@@ -11,6 +11,9 @@ import {
   HeaderUser,
 } from "./Header.styled";
 
+import logo from "../../assets/logo.png";
+import logo_dark from "../../assets/logo_dark.png";
+
 function Header() {
   const [isUserPopupOpen, setIsUserPopupOpen] = useState(false);
   const navigate = useNavigate();
@@ -24,7 +27,7 @@ function Header() {
     JSON.parse(localStorage.getItem("userInfo") || "{}").name || "Пользователь";
 
   const logoSrc =
-    theme === "dark" ? "/assets/logo_dark.png" : "/assets/logo.png";
+    theme === "dark" ? logo_dark : logo;
 
   return (
     <HeaderBlock>

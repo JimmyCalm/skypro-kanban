@@ -85,14 +85,14 @@ function PopBrowse({ task, onClose }) {
   const [editedDate, setEditedDate] = useState(
     task?.date ? formatDateForDisplay(task.date) : ""
   );
-  const [error, setError] = useState("");
+  const [errors, setErrors] = useState({});
 
   useEffect(() => {
     if (task) {
       setEditedStatus(task.status || "БЕЗ СТАТУСА");
       setEditedDescription(task.description || "");
       setEditedDate(task.date ? formatDateForDisplay(task.date) : "");
-      setError("");
+      setErrors({});
     }
   }, [task]);
 
@@ -117,21 +117,53 @@ function PopBrowse({ task, onClose }) {
 
   const themeClass = getThemeClass(task.topic);
 
+  const validateEditForm = () => {
+    const newErrors = {};
+    
+    if (!editedDescription.trim()) {
+      newErrors.description = "Введите описание задачи";
+    }
+    
+    if (!editedDate.trim()) {
+      newErrors.date = "Выберите дату";
+    } else {
+      const dateRegex = /^\d{2}\.\d{2}\.\d{4}$/;
+      if (!dateRegex.test(editedDate)) {
+        newErrors.date = "Неверный формат даты. Используйте ДД.ММ.ГГГГ";
+      } else {
+        const [day, month, year] = editedDate.split('.');
+        const dateObj = new Date(year, month - 1, day);
+        if (isNaN(dateObj.getTime())) {
+          newErrors.date = "Неверная дата";
+        } else {
+          const today = new Date();
+          today.setHours(0, 0, 0, 0);
+          dateObj.setHours(0, 0, 0, 0);
+          if (dateObj < today) {
+            newErrors.date = "Дата не может быть в прошлом";
+          }
+        }
+      }
+    }
+    
+    setErrors(newErrors);
+    return Object.keys(newErrors).length === 0;
+  };
+
   const handleCancel = () => {
     setEditedStatus(task.status || "БЕЗ СТАТУСА");
     setEditedDescription(task.description || "");
     setEditedDate(task.date ? formatDateForDisplay(task.date) : "");
     setIsEditMode(false);
-    setError("");
+    setErrors({});
   };
 
   const handleSave = async () => {
-    if (!editedDescription.trim()) {
-      setError("Введите описание задачи");
+    if (!validateEditForm()) {
       return;
     }
 
-    setError("");
+    setErrors({});
 
     try {
       const serverId = task._id || task.id;
@@ -153,7 +185,9 @@ function PopBrowse({ task, onClose }) {
 
       setIsEditMode(false);
     } catch (error) {
-      setError("Не удалось обновить задачу: " + error.message);
+      setErrors({ 
+        general: "Не удалось обновить задачу: " + error.message 
+      });
       console.error("Ошибка обновления задачи:", error);
     }
   };
@@ -171,7 +205,9 @@ function PopBrowse({ task, onClose }) {
 
       navigate("/");
     } catch (error) {
-      setError("Не удалось удалить задачу: " + error.message);
+      setErrors({ 
+        general: "Не удалось удалить задачу: " + error.message 
+      });
       console.error("Ошибка удаления задачи:", error);
     }
   };
@@ -194,7 +230,7 @@ function PopBrowse({ task, onClose }) {
               </CategoryTheme>
             </PopBrowseTopBlock>
 
-            {error && (
+            {errors.general && (
               <div
                 style={{
                   color: "#ff4444",
@@ -205,7 +241,7 @@ function PopBrowse({ task, onClose }) {
                   fontSize: "14px",
                 }}
               >
-                {error}
+                {errors.general}
               </div>
             )}
 
@@ -255,15 +291,61 @@ function PopBrowse({ task, onClose }) {
                     readOnly={!isEditMode || isLoading}
                     placeholder="Введите описание задачи..."
                     value={editedDescription}
-                    onChange={(e) => setEditedDescription(e.target.value)}
+                    onChange={(e) => {
+                      setEditedDescription(e.target.value);
+                      if (errors.description) {
+                        setErrors(prev => ({ ...prev, description: undefined }));
+                      }
+                    }}
+                    style={{ 
+                      borderColor: errors.description ? "#ff4444" : "",
+                      marginBottom: errors.description ? "5px" : "0"
+                    }}
                   />
+                  {errors.description && (
+                    <div style={{ 
+                      color: "#ff4444", 
+                      fontSize: "12px", 
+                      marginTop: "5px",
+                      marginBottom: "10px"
+                    }}>
+                      {errors.description}
+                    </div>
+                  )}
                 </FormBrowseBlock>
               </PopBrowseForm>
-              <Calendar
-                value={editedDate}
-                onChange={setEditedDate}
-                isDisabled={!isEditMode || isLoading}
-              />
+              
+              <div style={{ flex: 1, marginLeft: "20px" }}>
+                <label className="subttl" style={{ 
+                  marginBottom: "10px", 
+                  display: "block",
+                  color: "var(--text)",
+                  fontSize: "14px",
+                  fontWeight: "600",
+                  lineHeight: "1"
+                }}>
+                  Дата завершения
+                </label>
+                <Calendar
+                  value={editedDate}
+                  onChange={(value) => {
+                    setEditedDate(value);
+                    if (errors.date) {
+                      setErrors(prev => ({ ...prev, date: undefined }));
+                    }
+                  }}
+                  isDisabled={!isEditMode || isLoading}
+                />
+                {errors.date && (
+                  <div style={{ 
+                    color: "#ff4444", 
+                    fontSize: "12px", 
+                    marginTop: "10px"
+                  }}>
+                    {errors.date}
+                  </div>
+                )}
+              </div>
             </PopBrowseWrap>
 
             {!isEditMode ? (
@@ -298,7 +380,11 @@ function PopBrowse({ task, onClose }) {
                   <button
                     className="btn-edit__edit _btn-bg _hover01"
                     onClick={handleSave}
-                    disabled={isLoading}
+                    disabled={isLoading || !editedDescription.trim() || !editedDate.trim()}
+                    style={{
+                      opacity: (isLoading || !editedDescription.trim() || !editedDate.trim()) ? 0.7 : 1,
+                      cursor: (isLoading || !editedDescription.trim() || !editedDate.trim()) ? "not-allowed" : "pointer"
+                    }}
                   >
                     {isLoading ? "Сохранение..." : "Сохранить"}
                   </button>

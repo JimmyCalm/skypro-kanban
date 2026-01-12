@@ -6,27 +6,29 @@ const AuthContext = createContext(null);
 export function AuthProvider({ children }) {
   const [token, setToken] = useState(() => localStorage.getItem("token"));
   const [user, setUser] = useState(() => {
-    const u = localStorage.getItem("userInfo");
+    const userInfo = localStorage.getItem("userInfo");
     try {
-      return u ? JSON.parse(u) : null;
+      return userInfo ? JSON.parse(userInfo) : null;
     } catch {
       return null;
     }
   });
   const [isAuthLoading, setIsAuthLoading] = useState(false);
 
-  const login = async ({ login, password }) => {
+  const login = async ({ login: userLogin, password }) => {
     setIsAuthLoading(true);
     try {
-      const res = await apiSignIn({ login, password });
-      const t = res.token || res.user?.token;
-      const u = res.user || res;
-      if (!t) throw new Error("Не получен токен");
-      setToken(t);
-      setUser(u);
-      localStorage.setItem("token", t);
-      localStorage.setItem("userInfo", JSON.stringify(u));
-      return u;
+      const response = await apiSignIn({ login: userLogin, password });
+      const authToken = response.token || response.user?.token;
+      const userData = response.user || response;
+      
+      if (!authToken) throw new Error("Не получен токен");
+      
+      setToken(authToken);
+      setUser(userData);
+      localStorage.setItem("token", authToken);
+      localStorage.setItem("userInfo", JSON.stringify(userData));
+      return userData;
     } catch (error) {
       console.error("Ошибка входа:", error);
       throw error;
@@ -35,18 +37,20 @@ export function AuthProvider({ children }) {
     }
   };
 
-  const register = async ({ name, login, password }) => {
+  const register = async ({ name, login: userLogin, password }) => {
     setIsAuthLoading(true);
     try {
-      const res = await apiSignUp({ name, login, password });
-      const t = res.token || res.user?.token;
-      const u = res.user || res;
-      if (!t) throw new Error("Не получен токен");
-      setToken(t);
-      setUser(u);
-      localStorage.setItem("token", t);
-      localStorage.setItem("userInfo", JSON.stringify(u));
-      return u;
+      const response = await apiSignUp({ name, login: userLogin, password });
+      const authToken = response.token || response.user?.token;
+      const userData = response.user || response;
+      
+      if (!authToken) throw new Error("Не получен токен");
+      
+      setToken(authToken);
+      setUser(userData);
+      localStorage.setItem("token", authToken);
+      localStorage.setItem("userInfo", JSON.stringify(userData));
+      return userData;
     } catch (error) {
       console.error("Ошибка регистрации:", error);
       throw error;

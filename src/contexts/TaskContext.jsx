@@ -23,6 +23,33 @@ const toUiStatusMap = {
   Готово: "ГОТОВО",
 };
 
+const normalizeTasks = (apiData) => {
+  const tasksArray = apiData?.tasks || apiData || [];
+  return (Array.isArray(tasksArray) ? tasksArray : []).map((task) => ({
+    ...task,
+    id: task._id || task.id,
+    _id: task._id || task.id,
+    status: toUiStatusMap[task.status] || task.status || "БЕЗ СТАТУСА",
+    topic: task.topic || "Web Design",
+  }));
+};
+
+const normalizeSingleTask = (task) => ({
+  ...task,
+  id: task._id || task.id,
+  _id: task._id || task.id,
+  status: toUiStatusMap[task.status] || task.status || "БЕЗ СТАТУСА",
+  topic: task.topic || "Web Design",
+});
+
+const prepareTaskForApi = (task) => ({
+  title: task.title || "Новая задача",
+  topic: task.topic || "Research",
+  status: toApiStatusMap[task.status] || "Без статуса",
+  description: task.description || "",
+  date: task.date || new Date().toISOString(),
+});
+
 const TaskContext = createContext(null);
 
 export function TaskProvider({ children }) {
@@ -33,37 +60,18 @@ export function TaskProvider({ children }) {
   const [operationLoading, setOperationLoading] = useState(false);
   const [operationError, setOperationError] = useState(null);
 
-  const normalizeTasks = (apiData) => {
-    const tasksArray = apiData?.tasks || apiData || [];
-    return (Array.isArray(tasksArray) ? tasksArray : []).map((t) => ({
-      ...t,
-      id: t._id,
-      _id: t._id,
-      status: toUiStatusMap[t.status] || t.status || "БЕЗ СТАТУСА",
-      topic: t.topic || "Web Design",
-    }));
-  };
-
-  const normalizeSingleTask = (t) => ({
-    ...t,
-    id: t._id,
-    _id: t._id,
-    status: toUiStatusMap[t.status] || t.status || "БЕЗ СТАТУСА",
-    topic: t.topic || "Web Design",
-  });
-
   const loadTasks = async () => {
     if (!token) return;
     setTasksLoading(true);
     setTasksError(null);
     try {
       const data = await apiFetch({ token });
-      const normalized = normalizeTasks(data);
-      setTasks(normalized);
-    } catch (e) {
-      const errorMsg = e.message || "Ошибка при загрузке задач";
-      setTasksError(errorMsg);
-      console.error("Ошибка загрузки задач:", e);
+      const normalizedTasks = normalizeTasks(data);
+      setTasks(normalizedTasks);
+    } catch (error) {
+      const errorMessage = error.message || "Ошибка при загрузке задач";
+      setTasksError(errorMessage);
+      console.error("Ошибка загрузки задач:", error);
     } finally {
       setTasksLoading(false);
     }
@@ -84,13 +92,7 @@ export function TaskProvider({ children }) {
     setOperationError(null);
 
     try {
-      const apiTask = {
-        title: task.title || "Новая задача",
-        topic: task.topic || "Research",
-        status: toApiStatusMap[task.status] || "Без статуса",
-        description: task.description || "",
-        date: task.date || new Date().toISOString(),
-      };
+      const apiTask = prepareTaskForApi(task);
 
       console.log("Отправка задачи на сервер:", apiTask);
 
@@ -109,19 +111,19 @@ export function TaskProvider({ children }) {
       const response = await apiCreate({ token, task: apiTask });
       console.log("Ответ от API при создании:", response);
 
-      if (response?.tasks) {
-        const normalized = normalizeTasks(response);
-        console.log("Обновляем задачи из ответа API:", normalized);
-        setTasks(normalized);
+      if (response?.tasks || response) {
+        const normalizedResponse = normalizeTasks(response);
+        console.log("Обновляем задачи из ответа API:", normalizedResponse);
+        setTasks(normalizedResponse);
       }
-    } catch (e) {
-      console.error("Ошибка при создании задачи:", e);
+    } catch (error) {
+      console.error("Ошибка при создании задачи:", error);
 
       setTasks((prev) => prev.filter((t) => !t.id.startsWith("temp-")));
 
-      const errorMessage = e.message || "Ошибка при создании задачи";
+      const errorMessage = error.message || "Ошибка при создании задачи";
       setOperationError(errorMessage);
-      throw e;
+      throw error;
     } finally {
       setOperationLoading(false);
     }
@@ -131,19 +133,12 @@ export function TaskProvider({ children }) {
     setOperationLoading(true);
     setOperationError(null);
 
+    const currentTask = tasks.find((t) => t.id === id);
+
     try {
-      const apiTask = {
-        title: task.title || "Новая задача",
-        topic: task.topic || "Research",
-        status: toApiStatusMap[task.status] || "Без статуса",
-        description: task.description || "",
-        date: task.date || new Date().toISOString(),
-      };
+      const apiTask = prepareTaskForApi(task);
 
       console.log("Обновление задачи:", id, apiTask);
-
-      const currentTaskIndex = tasks.findIndex((t) => t.id === id);
-      const currentTask = tasks[currentTaskIndex];
 
       const updatedTask = normalizeSingleTask({
         ...task,
@@ -151,31 +146,26 @@ export function TaskProvider({ children }) {
         id: id,
         date: apiTask.date,
       });
+      
       setTasks((prev) => prev.map((t) => (t.id === id ? updatedTask : t)));
 
       const response = await apiUpdate({ token, id, task: apiTask });
       console.log("Ответ от API при обновлении:", response);
 
-      if (response?.tasks) {
-        const normalized = normalizeTasks(response);
-        setTasks(normalized);
+      if (response?.tasks || response) {
+        const normalizedResponse = normalizeTasks(response);
+        setTasks(normalizedResponse);
       }
-    } catch (e) {
-      console.error("Ошибка при обновлении задачи:", e);
+    } catch (error) {
+      console.error("Ошибка при обновлении задачи:", error);
 
-      // 4. При ошибке откатываем оптимистичное обновление
-      // НЕ делаем GET запрос, просто откатываем локально
-      setTasks((prev) => {
-        const newTasks = [...prev];
-        if (currentTask) {
-          newTasks[currentTaskIndex] = currentTask;
-        }
-        return newTasks;
-      });
+      if (currentTask) {
+        setTasks((prev) => prev.map((t) => (t.id === id ? currentTask : t)));
+      }
 
-      const errorMessage = e.message || "Ошибка при обновлении задачи";
+      const errorMessage = error.message || "Ошибка при обновлении задачи";
       setOperationError(errorMessage);
-      throw e;
+      throw error;
     } finally {
       setOperationLoading(false);
     }
@@ -185,40 +175,38 @@ export function TaskProvider({ children }) {
     setOperationLoading(true);
     setOperationError(null);
 
+    const deletedTask = tasks.find((t) => t.id === id);
+
     try {
       console.log("Удаление задачи:", id);
-
-      const deletedTask = tasks.find((t) => t.id === id);
 
       setTasks((prev) => prev.filter((t) => t.id !== id));
 
       const response = await apiDelete({ token, id });
       console.log("Ответ от API при удалении:", response);
 
-      if (response?.tasks) {
-        const normalized = normalizeTasks(response);
-        setTasks(normalized);
+      if (response?.tasks || response) {
+        const normalizedResponse = normalizeTasks(response);
+        setTasks(normalizedResponse);
       }
-    } catch (e) {
-      console.error("Ошибка при удалении задачи:", e);
+    } catch (error) {
+      console.error("Ошибка при удалении задачи:", error);
 
-      // 4. При ошибке возвращаем удаленную задачу обратно
-      // НЕ делаем GET запрос, просто откатываем локально
       if (deletedTask) {
         setTasks((prev) => [...prev, deletedTask]);
       }
 
-      const errorMessage = e.message || "Ошибка при удалении задачи";
+      const errorMessage = error.message || "Ошибка при удалении задачи";
       setOperationError(errorMessage);
-      throw e;
+      throw error;
     } finally {
       setOperationLoading(false);
     }
   };
 
   const setTasksDirectly = (newTasks) => {
-    const normalized = normalizeTasks(newTasks);
-    setTasks(normalized);
+    const normalizedTasks = normalizeTasks(newTasks);
+    setTasks(normalizedTasks);
   };
 
   const value = useMemo(
