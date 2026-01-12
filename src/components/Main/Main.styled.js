@@ -1,40 +1,44 @@
-import styled from 'styled-components';
+import styled from "styled-components";
 
-export const MainWrapper = styled.main`
+export const MainBlock = styled.main`
   width: 100%;
-  background-color: #eaeef6;
-`;
-
-export const MainBlock = styled.div`
+  background-color: ${({ theme }) => theme.background};
   display: flex;
-  min-height: 100vh;
-  width: 100%;
-  margin: 0 auto;
-  padding: 25px 0 49px;
-
-  @media screen and (max-width: 1200px) {
-    width: 100%;
-    margin: 0 auto;
-    padding: 40px 0 64px;
-  }
+  justify-content: center;
+  transition: background-color 0.3s;
 `;
 
 export const MainContent = styled.div`
-  width: 100%;
   display: flex;
+  width: 100%;
+  margin: 0 auto;
+  padding: 25px 0 49px;
+  gap: 10px;
+  text-align: left;
 
   @media screen and (max-width: 1200px) {
+    width: 100%;
+    padding: 40px 0 64px;
     display: block;
   }
 `;
 
-export const LoadingContainer = styled.div`
+export const LoadingText = styled.div`
   width: 100%;
-  height: 60vh;
-  display: flex;
-  align-items: center;
-  justify-content: center;
+  text-align: center;
   font-size: 24px;
-  color: #565eef;
-  font-weight: 600;
+  color: ${({ theme }) => theme.text};
+  margin-top: 50px;
+  animation: pulse 1.5s infinite;
+  transition: color 0.3s;
+`;
+
+export const EmptyTasksText = styled.div`
+  width: 100%;
+  text-align: center;
+  font-size: 18px;
+  color: ${({ theme }) => theme.text};
+  margin-top: 50px;
+  font-style: italic;
+  transition: color 0.3s;
 `;

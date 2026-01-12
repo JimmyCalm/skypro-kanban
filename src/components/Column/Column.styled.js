@@ -1,38 +1,49 @@
-import styled from 'styled-components';
+import styled from "styled-components";
 
-export const ColumnWrapper = styled.div`
-  width: 20%;
+export const ColumnWrapper = styled.div.attrs((props) => ({
+  $title: undefined,
+  $cards: undefined,
+  key: undefined,
+}))`
   margin: 0 auto;
   display: block;
 
   @media screen and (max-width: 1200px) {
     width: 100%;
-    margin: 0 auto;
-    display: block;
   }
 `;
 
-export const ColumnTitle = styled.div`
-  padding: 0 10px;
+export const ColumnTitle = styled.div.attrs((props) => ({
+  key: undefined,
+}))`
+  padding: 0 5px;
   margin: 15px 0;
 
   p {
-    color: #94a6be;
-    font-size: 14px;
+    min-width: 220px;
+    color: ${({ theme }) => theme.mutedText};
+    font-size: 16px;
     font-weight: 600;
     line-height: 1;
     text-transform: uppercase;
+    transition: color 0.3s;
   }
 `;
 
-export const CardsContainer = styled.div`
+export const CardsContainer = styled.div.attrs((props) => ({
+  key: undefined,
+}))`
   width: 100%;
-  display: block;
-  position: relative;
+  display: flex;
+  flex-direction: column;
 
   @media screen and (max-width: 1200px) {
-    width: 100%;
-    display: flex;
-    overflow-y: auto;
+    flex-direction: row;
+    overflow-x: auto;
+    padding-bottom: 10px;
+
+    & > * {
+      flex: 0 0 auto;
+    }
   }
 `;

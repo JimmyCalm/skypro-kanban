@@ -1,36 +1,81 @@
+import { useNavigate } from "react-router-dom";
 import {
   CardItem,
   CardWrapper,
   CardGroup,
   CardTheme,
   CardButton,
-  CardContent,
   CardTitle,
+  CardContent,
   CardDate,
 } from "./Card.styled";
-import { Link } from "react-router-dom";
 
-export default function Card({ cardData }) {
-  const { topic, title } = cardData;
-  const theme = topic.toLowerCase().replace(" ", "");
+export const formatDisplayDate = (date) => {
+  if (!date) return "";
+  if (typeof date === "string" && /^\d{2}\.\d{2}\.\d{4}$/.test(date)) {
+    return date;
+  }
+
+  try {
+    const d = new Date(date);
+    if (isNaN(d)) return "";
+    const day = String(d.getDate()).padStart(2, "0");
+    const month = String(d.getMonth() + 1).padStart(2, "0");
+    const year = d.getFullYear();
+    return `${day}.${month}.${year}`;
+  } catch (error) {
+    console.error("Ошибка форматирования даты:", error);
+    return "";
+  }
+};
+
+function Card({ card }) {
+  const getTheme = () => {
+    if (!card.topic) return "gray";
+
+    const topicLower = card.topic.toLowerCase();
+    if (topicLower.includes("web") || topicLower.includes("design")) {
+      return "webdesign";
+    }
+    if (topicLower.includes("research")) {
+      return "research";
+    }
+    if (topicLower.includes("copywriting")) {
+      return "copywriting";
+    }
+    return "gray";
+  };
+
+  const theme = getTheme();
+  const navigate = useNavigate();
+
+  if (!card) return null;
+
+  const handleCardClick = (e) => {
+    e.stopPropagation();
+    const cardId = card.id ?? card._id ?? card.taskId ?? card.uuid;
+    if (!cardId) {
+      console.warn("Карточка без id:", card);
+      return;
+    }
+    navigate(`/card/${cardId}`);
+  };
 
   return (
-    <CardItem className="cards__item">
-      <CardWrapper className="card">
+    <CardItem>
+      <CardWrapper>
         <CardGroup>
-          <CardTheme theme={theme} className={`card__theme _${theme}`}>
-            <p className={`_${theme}`}>{topic}</p>
+          <CardTheme theme={theme}>
+            <p>{card.topic || "Без категории"}</p>
           </CardTheme>
-          <CardButton as={Link} to={`/card/${cardData._id}`}>
+          <CardButton onClick={handleCardClick}>
             <div></div>
             <div></div>
             <div></div>
           </CardButton>
         </CardGroup>
         <CardContent>
-          <Link to="" target="_blank">
-            <CardTitle>{title}</CardTitle>
-          </Link>
+          <CardTitle>{card.title || "Без названия"}</CardTitle>
           <CardDate>
             <svg
               xmlns="http://www.w3.org/2000/svg"
@@ -47,7 +92,7 @@ export default function Card({ cardData }) {
                   strokeLinejoin="round"
                 />
                 <path
-                  d="M11.7812 4.0625H1.21875M3.25 1.21875V2.03125V1.21875ZM9.75 1.21875V2.03125V1.21875Z"
+                  d="M11.7812 4.0625H1.21875 M3.25 1.21875V2.03125 M9.75 1.21875V2.03125"
                   stroke="#94A6BE"
                   strokeWidth="0.8"
                   strokeLinecap="round"
@@ -60,10 +105,12 @@ export default function Card({ cardData }) {
                 </clipPath>
               </defs>
             </svg>
-            <p>{cardData.date}</p>
+            <p>{formatDisplayDate(card.date)}</p>
           </CardDate>
         </CardContent>
       </CardWrapper>
     </CardItem>
   );
 }
+
+export default Card;

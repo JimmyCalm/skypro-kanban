@@ -1,65 +1,29 @@
-import { Routes, Route, Navigate } from "react-router-dom";
-import { useContext } from "react";
-import { AuthContext } from "../context/AuthContext";
+import React from "react";
+import { Routes, Route } from "react-router-dom";
 import MainPage from "../pages/MainPage";
-import LoginPage from "../pages/LoginPage";
-import RegisterPage from "../pages/RegisterPage";
+import CardPage from "../pages/CardPage";
+import NewCardPage from "../pages/NewCardPage";
 import ExitPage from "../pages/ExitPage";
+import SignInPage from "../pages/SignInPage";
+import SignUpPage from "../pages/SignUpPage";
 import NotFoundPage from "../pages/NotFoundPage";
-import PopBrowse from "../components/popups/PopBrowse";
-import PopNewCardPage from "../pages/PopNewCardPage";
-import Layout from "./Layout";
+import PrivateRoute from "./PrivateRoute";
 
-function ProtectedRoute({ children }) {
-  const { isAuth } = useContext(AuthContext);
- 
-  return isAuth ? children : <Navigate to="/login" replace />;
-}
-
-function PublicRoute({ children }) {
-  const { isAuth, isLoading } = useContext(AuthContext);
-  
-  if (isLoading) {
-    return <div>Загрузка...</div>;
-  }
-  
-  return !isAuth ? children : <Navigate to="/" replace />;
-}
-
-export default function AppRoutes() {
+function AppRoutes() {
   return (
     <Routes>
-      <Route
-        element={
-          <ProtectedRoute>
-            <Layout />
-          </ProtectedRoute>
-        }
-      >
+      <Route element={<PrivateRoute />}>
         <Route path="/" element={<MainPage />}>
-          <Route path="card/:id" element={<PopBrowse />} />
-          <Route path="new" element={<PopNewCardPage />} />
-          <Route path="exit" element={<ExitPage />} />
+          <Route path="new-card" element={<NewCardPage />} />
+          <Route path="/card/:id" element={<CardPage />} />
         </Route>
+        <Route path="/exit" element={<ExitPage />} />
       </Route>
-      
-      <Route 
-        path="/login" 
-        element={
-          <PublicRoute>
-            <LoginPage />
-          </PublicRoute>
-        } 
-      />
-      <Route 
-        path="/register" 
-        element={
-          <PublicRoute>
-            <RegisterPage />
-          </PublicRoute>
-        } 
-      />
+      <Route path="/login" element={<SignInPage />} />
+      <Route path="/register" element={<SignUpPage />} />
       <Route path="*" element={<NotFoundPage />} />
     </Routes>
   );
 }
+
+export default AppRoutes;

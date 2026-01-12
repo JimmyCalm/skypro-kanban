@@ -1,19 +1,31 @@
-import Card from '../Card/Card';
-import { ColumnWrapper, ColumnTitle, CardsContainer } from './Column.styled';
+import React from "react";
+import Card from "../Card/Card";
+import { ColumnWrapper, ColumnTitle, CardsContainer } from "./Column.styled";
 
-export default function Column({ title, cards }) {
-  const filteredCards = cards.filter((card) => card.status === title);
-
+function Column({ title, cards }) {
   return (
-    <ColumnWrapper className="column">
+    <ColumnWrapper>
       <ColumnTitle>
         <p>{title}</p>
       </ColumnTitle>
-      <CardsContainer className="cards">
-        {filteredCards.map((card) => (
-          <Card key={card._id} cardData={card} />
-        ))}
+      <CardsContainer>
+        {cards && cards.length > 0 ? (
+          cards.map((card, index) => (
+            <Card
+              key={card.id ?? `${card.title || "no-title"}-${index}`}
+              card={card}
+            />
+          ))
+        ) : (
+          <div
+            style={{ padding: "10px", color: "#94A6BE", fontStyle: "italic" }}
+          >
+            Нет задач
+          </div>
+        )}
       </CardsContainer>
     </ColumnWrapper>
   );
 }
+
+export default Column;

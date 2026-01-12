@@ -1,109 +1,80 @@
-import Column from "../components/Column/Column";
-import { useContext, useEffect, useState } from "react";
-import {
-  MainWrapper,
-  MainBlock,
-  MainContent,
-  LoadingContainer,
-} from "../components/Main/Main.styled";
-import { Outlet, useNavigate } from "react-router-dom";
-import { getTasks } from "../services/kanban";
-import { AuthContext } from "../context/AuthContext";
-import { TaskContext } from "../context/TaskContext";
+import Header from "../components/Header/Header";
+import Main from "../components/Main/Main";
+import { Outlet } from "react-router-dom";
+import { GlobalStyles } from "../styles/GlobalStyles.styled";
+import { useEffect, useState } from "react";
+import { useTasks } from "../contexts/TaskContext";
 
-export default function MainPage() {
-  const statuses = [
-    "Без статуса",
-    "Нужно сделать",
-    "В работе",
-    "Тестирование",
-    "Готово",
-  ];
-  
-  const { user, isAuth, setIsAuth } = useContext(AuthContext);
-  const { tasks, setTasks } = useContext(TaskContext);
-  const navigate = useNavigate();
-  
-  const [isLoading, setIsLoading] = useState(false);
-  const [hasLoaded, setHasLoaded] = useState(false);
-
-  const formatDate = (isoDate) => {
-    if (!isoDate) return "";
-    const date = new Date(isoDate);
-    const day = String(date.getDate()).padStart(2, "0");
-    const month = String(date.getMonth() + 1).padStart(2, "0");
-    const year = String(date.getFullYear()).slice(2);
-    return `${day}.${month}.${year}`;
-  };
+function MainPage() {
+  const { operationError, clearOperationError } = useTasks();
+  const [showError, setShowError] = useState(false);
 
   useEffect(() => {
+    if (operationError) {
+      console.error("Ошибка операций с задачами:", operationError);
+      setShowError(true);
 
-    if (!isAuth) {
-      navigate("/login");
-      return;
+      const timer = setTimeout(() => {
+        setShowError(false);
+        clearOperationError();
+      }, 5000);
+
+      return () => clearTimeout(timer);
+    } else {
+      setShowError(false);
     }
+  }, [operationError, clearOperationError]);
 
-
-    if (!user?.token) {
-      setIsAuth(false);
-      navigate("/login");
-      return;
-    }
-
-
-    const fetchTasks = async () => {
-      try {
-
-        if (!hasLoaded) {
-          setIsLoading(true);
-        }
-        
-        const fetchedTasks = await getTasks(user.token);
-        const formattedTasks = fetchedTasks.map((task) => ({
-          ...task,
-          date: formatDate(task.date),
-        }));
-        setTasks(formattedTasks);
-        setHasLoaded(true);
-      } catch (error) {
-        console.error("Ошибка загрузки задач:", error.message);
-        if (error.message.includes("401") || error.response?.status === 401) {
-          setIsAuth(false);
-          navigate("/login");
-        }
-      } finally {
-        setIsLoading(false);
-      }
-    };
-
-
-    if (!hasLoaded || (user?.token && hasLoaded)) {
-      fetchTasks();
-    }
-  }, [isAuth, user.token, navigate, setIsAuth, setTasks, hasLoaded]);
+  const handleCloseError = () => {
+    setShowError(false);
+    clearOperationError();
+  };
 
   return (
-    <>
-      <MainWrapper className="main">
-        <div className="container">
-          <MainBlock>
-            {isLoading ? (
-              <LoadingContainer>Данные загружаются...</LoadingContainer>
-            ) : (
-              <MainContent>
-                {statuses.map((status) => (
-                  <Column
-                    key={status}
-                    title={status}
-                    cards={tasks.filter((task) => task.status === status)}
-                  />
-                ))}
-              </MainContent>
-            )}
-          </MainBlock>
+    <div className="wrapper">
+      <GlobalStyles />
+      <Header />
+
+      {/* Глобальное уведомление об ошибке */}
+      {showError && operationError && (
+        <div
+          style={{
+            position: "fixed",
+            top: "20px",
+            right: "20px",
+            backgroundColor: "#ff4444",
+            color: "white",
+            padding: "15px 20px",
+            borderRadius: "8px",
+            zIndex: 1000,
+            boxShadow: "0 4px 12px rgba(0,0,0,0.15)",
+            maxWidth: "400px",
+            display: "flex",
+            justifyContent: "space-between",
+            alignItems: "center",
+          }}
+        >
+          <span style={{ flex: 1 }}>{operationError}</span>
+          <button
+            onClick={handleCloseError}
+            style={{
+              background: "none",
+              border: "none",
+              color: "white",
+              fontSize: "20px",
+              cursor: "pointer",
+              marginLeft: "10px",
+              padding: "0 5px",
+            }}
+          >
+            ×
+          </button>
         </div>
-      </MainWrapper>
+      )}
+
+      <Main />
       <Outlet />
-    </>
+    </div>
   );
 }
+export default MainPage;
